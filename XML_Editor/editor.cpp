@@ -1,5 +1,5 @@
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "editor.h"
+#include "ui_editor.h"
 #include "QFile"
 #include "QFileDialog"
 #include "QDir"
@@ -9,30 +9,30 @@
 #include "QFontDialog"
 #include "QColor"
 #include "QColorDialog"
+#include "QVector"
 
-MainWindow::MainWindow(QWidget *parent)
+Editor::Editor(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    , ui(new Ui::Editor)
 {
     ui->setupUi(this);
     this->setCentralWidget(ui->textEdit);
-    ui->textEdit->setStyleSheet("font: 15pt 'Consolas';");
+    ui->textEdit->setStyleSheet("font: 11pt 'Consolas';");
 }
 
-MainWindow::~MainWindow()
+Editor::~Editor()
 {
     delete ui;
 }
 
 
-void MainWindow::on_actionNew_triggered()
+void Editor::on_actionNew_triggered()
 {
     fpath = "";
     ui->textEdit->setText("");
 }
 
-
-void MainWindow::on_actionOpen_triggered()
+void Editor::on_actionOpen_triggered()
 {
     QString filter = "All Files *.* ;; XML *.xml ;; JSON *.json";
     QString filename = QFileDialog::getOpenFileName(this, "Open a File", QDir::currentPath(), filter);
@@ -44,14 +44,34 @@ void MainWindow::on_actionOpen_triggered()
     }
     else{
         QTextStream in(&file);
-        QString file_text = in.readAll();
+        QString file_text = "";
+        qint32 num_of_lines = 0;
+        while(!in.atEnd()){
+            num_of_lines +=1;
+            QString temp = in.readLine();
+            file_text += temp;
+            file_text += "\n";
+            lines.push_back(temp);
+        }
         ui->textEdit->setText(file_text);
         file.close();
+        ui->statusbar->showMessage("This File has " + QString::number(num_of_lines) + " Lines", 3000);
+        for(int i=0; i<lines.size(); i++){
+            QString line = lines[i];
+            qint32 index = 0;
+            qint32 j = 0;
+            while(line[j] == ' '){
+                index += 1;
+                j += 1;
+            }
+            lines[i] = line.mid(j);
+            //qDebug() << lines[i];
+        }
     }
 }
 
 
-void MainWindow::on_actionSave_triggered()
+void Editor::on_actionSave_triggered()
 {
     QString filename = fpath;
     if(filename == ""){
@@ -74,7 +94,7 @@ void MainWindow::on_actionSave_triggered()
 }
 
 
-void MainWindow::on_actionSave_As_triggered()
+void Editor::on_actionSave_As_triggered()
 {
     QString filename = QFileDialog::getSaveFileName(this, "Open a File", QDir::currentPath());
     fpath = filename;
@@ -93,72 +113,67 @@ void MainWindow::on_actionSave_As_triggered()
 }
 
 
-void MainWindow::on_actionCut_triggered()
+void Editor::on_actionCut_triggered()
 {
     ui->textEdit->cut();
 }
 
 
-void MainWindow::on_actionCopy_triggered()
+void Editor::on_actionCopy_triggered()
 {
     ui->textEdit->copy();
 }
 
-
-void MainWindow::on_actionPaste_triggered()
+void Editor::on_actionPaste_triggered()
 {
     ui->textEdit->paste();
 }
 
 
-void MainWindow::on_actionUndo_triggered()
+void Editor::on_actionUndo_triggered()
 {
     ui->textEdit->undo();
 }
 
 
-void MainWindow::on_actionRedo_triggered()
+void Editor::on_actionRedo_triggered()
 {
     ui->textEdit->redo();
 }
 
-/*
-void MainWindow::on_actionFont_Preferences_triggered()
+
+void Editor::on_actionFont_Color_Preferences_triggered()
 {
-    bool ok;
-    QFont font = QFontDialog::getFont(&ok, this);
-    if(ok){
-        ui->textEdit->setFont(font);
+    QColor color = QColorDialog::getColor(Qt::black, this);
+    QString color_name = color.name();
+    if(ModeBit == 0){
+        ui->textEdit->setStyleSheet("background-color: 'white'; font: 11pt 'Consolas'; color: '" + color_name +"';");
     }
     else{
-        return;
+        ui->textEdit->setStyleSheet("background-color: #404040; font: 11pt 'Consolas'; color: '" + color_name +"';");
     }
 }
-*/
 
-void MainWindow::on_actionDark_Light_Mode_triggered()
+
+void Editor::on_actionDark_Light_mode_triggered()
 {
     if(ModeBit == 0){   // current mode: light. Switch to dark
-        ui->textEdit->setStyleSheet("background-color: #404040; font: 15pt 'Consolas'; color: 'white';");
+        ui->textEdit->setStyleSheet("background-color: #404040; font: 11pt 'Consolas'; color: 'white';");
         ModeBit = 1;
     }
     else if(ModeBit == 1){ // current mode: dark. Switch to light
-        ui->textEdit->setStyleSheet("background-color: 'white'; font: 15pt 'Consolas'; color: 'black';");
+        ui->textEdit->setStyleSheet("background-color: 'white'; font: 11pt 'Consolas'; color: 'black';");
         ModeBit = 0;
     }
 }
 
 
-void MainWindow::on_actionFont_Color_Preferences_triggered()
+void Editor::on_actionMinify_triggered()
 {
-    QColor color = QColorDialog::getColor(Qt::black, this);
-    QString color_name = color.name();
-    if(ModeBit == 0){
-        ui->textEdit->setStyleSheet("background-color: 'white'; font: 15pt 'Consolas'; color: '" + color_name +"';");
+    QString out = "";
+    for(int i=0; i<lines.size(); i++){
+        out += lines[i];
     }
-    else{
-        ui->textEdit->setStyleSheet("background-color: #404040; font: 15pt 'Consolas'; color: '" + color_name +"';");
-    }
-
+    ui->textEdit->setText(out);
 }
 

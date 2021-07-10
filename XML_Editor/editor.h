@@ -1,22 +1,24 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef EDITOR_H
+#define EDITOR_H
 
 #include <QMainWindow>
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
+namespace Ui { class Editor; }
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow
+class Editor : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    Editor(QWidget *parent = nullptr);
+    ~Editor();
 
 private slots:
     void on_actionNew_triggered();
+
+    void on_actionPaste_triggered();
 
     void on_actionOpen_triggered();
 
@@ -28,21 +30,20 @@ private slots:
 
     void on_actionCopy_triggered();
 
-    void on_actionPaste_triggered();
-
     void on_actionUndo_triggered();
 
     void on_actionRedo_triggered();
 
-    void on_actionFont_Preferences_triggered();
-
-    void on_actionDark_Light_Mode_triggered();
-
     void on_actionFont_Color_Preferences_triggered();
 
+    void on_actionDark_Light_mode_triggered();
+
+    void on_actionMinify_triggered();
+
 private:
-    Ui::MainWindow *ui;
+    Ui::Editor *ui;
     qint8 ModeBit = 0;   // 0 --> lightMode  1 --> darkMode
     QString fpath = "";
+    QVector<QString> lines;
 };
-#endif // MAINWINDOW_H
+#endif // EDITOR_H

@@ -2,19 +2,21 @@
     <qresource prefix="/icons">
         <file>icons/add-file.png</file>
         <file>icons/copy.png</file>
+        <file>icons/copy2.png</file>
         <file>icons/cut.png</file>
+        <file>icons/cut2.png</file>
+        <file>icons/dark light mode.png</file>
         <file>icons/edit.png</file>
         <file>icons/floppy-disk.png</file>
+        <file>icons/font color.png</file>
+        <file>icons/font style 2.png</file>
+        <file>icons/font style.png</file>
+        <file>icons/open.png</file>
         <file>icons/paste.png</file>
         <file>icons/redo.png</file>
         <file>icons/saveas.png</file>
         <file>icons/undo.png</file>
-        <file>icons/open.png</file>
-        <file>icons/copy2.png</file>
-        <file>icons/cut2.png</file>
-        <file>icons/font style 2.png</file>
-        <file>icons/font style.png</file>
-        <file>icons/font color.png</file>
-        <file>icons/dark light mode.png</file>
+        <file>icons/compress.png</file>
+        <file>icons/minify.png</file>
     </qresource>
 </RCC>

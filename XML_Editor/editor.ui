@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>Editor</class>
+ <widget class="QMainWindow" name="Editor">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>733</width>
-    <height>535</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Editor</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -25,7 +25,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>733</width>
+     <width>800</width>
      <height>25</height>
     </rect>
    </property>
@@ -49,8 +49,11 @@
     <addaction name="separator"/>
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
+    <addaction name="separator"/>
     <addaction name="actionFont_Color_Preferences"/>
-    <addaction name="actionDark_Light_Mode"/>
+    <addaction name="actionDark_Light_mode"/>
+    <addaction name="separator"/>
+    <addaction name="actionMinify"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -76,10 +79,15 @@
    <addaction name="separator"/>
    <addaction name="actionUndo"/>
    <addaction name="actionRedo"/>
+   <addaction name="separator"/>
+   <addaction name="actionFont_Color_Preferences"/>
+   <addaction name="actionDark_Light_mode"/>
+   <addaction name="separator"/>
+   <addaction name="actionMinify"/>
   </widget>
   <action name="actionNew">
    <property name="icon">
-    <iconset resource="resource.qrc">
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/icons/add-file.png</normaloff>:/icons/icons/add-file.png</iconset>
    </property>
    <property name="text">
@@ -88,7 +96,7 @@
   </action>
   <action name="actionOpen">
    <property name="icon">
-    <iconset resource="resource.qrc">
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/icons/open.png</normaloff>:/icons/icons/open.png</iconset>
    </property>
    <property name="text">
@@ -97,7 +105,7 @@
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset resource="resource.qrc">
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/icons/floppy-disk.png</normaloff>:/icons/icons/floppy-disk.png</iconset>
    </property>
    <property name="text">
@@ -106,7 +114,7 @@
   </action>
   <action name="actionSave_As">
    <property name="icon">
-    <iconset resource="resource.qrc">
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/icons/saveas.png</normaloff>:/icons/icons/saveas.png</iconset>
    </property>
    <property name="text">
@@ -115,7 +123,7 @@
   </action>
   <action name="actionCut">
    <property name="icon">
-    <iconset resource="resource.qrc">
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/icons/cut2.png</normaloff>:/icons/icons/cut2.png</iconset>
    </property>
    <property name="text">
@@ -124,7 +132,7 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset resource="resource.qrc">
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/icons/copy2.png</normaloff>:/icons/icons/copy2.png</iconset>
    </property>
    <property name="text">
@@ -133,7 +141,7 @@
   </action>
   <action name="actionPaste">
    <property name="icon">
-    <iconset resource="resource.qrc">
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/icons/paste.png</normaloff>:/icons/icons/paste.png</iconset>
    </property>
    <property name="text">
@@ -142,7 +150,7 @@
   </action>
   <action name="actionUndo">
    <property name="icon">
-    <iconset resource="resource.qrc">
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/icons/undo.png</normaloff>:/icons/icons/undo.png</iconset>
    </property>
    <property name="text">
@@ -151,34 +159,43 @@
   </action>
   <action name="actionRedo">
    <property name="icon">
-    <iconset resource="resource.qrc">
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/icons/redo.png</normaloff>:/icons/icons/redo.png</iconset>
    </property>
    <property name="text">
     <string>Redo</string>
    </property>
   </action>
-  <action name="actionDark_Light_Mode">
-   <property name="icon">
-    <iconset resource="resource.qrc">
-     <normaloff>:/icons/icons/dark light mode.png</normaloff>:/icons/icons/dark light mode.png</iconset>
-   </property>
-   <property name="text">
-    <string>Dark / Light Mode</string>
-   </property>
-  </action>
   <action name="actionFont_Color_Preferences">
    <property name="icon">
-    <iconset resource="resource.qrc">
+    <iconset resource="icons.qrc">
      <normaloff>:/icons/icons/font color.png</normaloff>:/icons/icons/font color.png</iconset>
    </property>
    <property name="text">
     <string>Font Color Preferences</string>
    </property>
   </action>
+  <action name="actionDark_Light_mode">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/icons/dark light mode.png</normaloff>:/icons/icons/dark light mode.png</iconset>
+   </property>
+   <property name="text">
+    <string>Dark / Light mode</string>
+   </property>
+  </action>
+  <action name="actionMinify">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/icons/minify.png</normaloff>:/icons/icons/minify.png</iconset>
+   </property>
+   <property name="text">
+    <string>Minify</string>
+   </property>
+  </action>
  </widget>
  <resources>
-  <include location="resource.qrc"/>
+  <include location="icons.qrc"/>
  </resources>
  <connections/>
 </ui>
