@@ -158,7 +158,7 @@ void Editor::on_actionFont_Color_Preferences_triggered()
 void Editor::on_actionDark_Light_mode_triggered()
 {
     if(ModeBit == 0){   // current mode: light. Switch to dark
-        ui->textEdit->setStyleSheet("background-color: #404040; font: 11pt 'Consolas'; color: 'white';");
+        ui->textEdit->setStyleSheet("background-color: #404040; font: 11pt 'Consolas'; color: #55ffff;");
         ModeBit = 1;
     }
     else if(ModeBit == 1){ // current mode: dark. Switch to light
