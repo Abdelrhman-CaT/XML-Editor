@@ -50,6 +50,7 @@
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
     <addaction name="actionFont_Preferences"/>
+    <addaction name="actionFont_Color_Preferences"/>
     <addaction name="actionDark_Light_Mode"/>
    </widget>
    <addaction name="menuFile"/>
@@ -159,13 +160,30 @@
    </property>
   </action>
   <action name="actionFont_Preferences">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icons/icons/font style.png</normaloff>:/icons/icons/font style.png</iconset>
+   </property>
    <property name="text">
-    <string>Font Preferences</string>
+    <string>Font Style Preferences</string>
    </property>
   </action>
   <action name="actionDark_Light_Mode">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icons/icons/dark light mode.png</normaloff>:/icons/icons/dark light mode.png</iconset>
+   </property>
    <property name="text">
     <string>Dark / Light Mode</string>
+   </property>
+  </action>
+  <action name="actionFont_Color_Preferences">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/icons/icons/font color.png</normaloff>:/icons/icons/font color.png</iconset>
+   </property>
+   <property name="text">
+    <string>Font Color Preferences</string>
    </property>
   </action>
  </widget>

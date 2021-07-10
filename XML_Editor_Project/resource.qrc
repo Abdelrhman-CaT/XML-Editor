@@ -12,5 +12,9 @@
         <file>icons/open.png</file>
         <file>icons/copy2.png</file>
         <file>icons/cut2.png</file>
+        <file>icons/font style 2.png</file>
+        <file>icons/font style.png</file>
+        <file>icons/font color.png</file>
+        <file>icons/dark light mode.png</file>
     </qresource>
 </RCC>

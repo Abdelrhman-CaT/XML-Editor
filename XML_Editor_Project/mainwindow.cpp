@@ -8,7 +8,7 @@
 #include "QFont"
 #include "QFontDialog"
 #include "QColor"
-
+#include "QColorDialog"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -140,12 +140,25 @@ void MainWindow::on_actionDark_Light_Mode_triggered()
 {
     if(ModeBit == 0){   // current mode: light. Switch to dark
         ui->textEdit->setStyleSheet("background-color: #404040; font: 15pt 'Consolas'; color: 'white';");
-        //ui->textEdit->setTextColor(QColor());
         ModeBit = 1;
     }
     else if(ModeBit == 1){ // current mode: dark. Switch to light
         ui->textEdit->setStyleSheet("background-color: 'white'; font: 15pt 'Consolas'; color: 'black';");
         ModeBit = 0;
     }
+}
+
+
+void MainWindow::on_actionFont_Color_Preferences_triggered()
+{
+    QColor color = QColorDialog::getColor(Qt::black, this);
+    QString color_name = color.name();
+    if(ModeBit == 0){
+        ui->textEdit->setStyleSheet("background-color: 'white'; font: 15pt 'Consolas'; color: '" + color_name +"';");
+    }
+    else{
+        ui->textEdit->setStyleSheet("background-color: #404040; font: 15pt 'Consolas'; color: '" + color_name +"';");
+    }
+
 }
 

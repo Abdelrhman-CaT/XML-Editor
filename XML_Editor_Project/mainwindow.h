@@ -38,6 +38,8 @@ private slots:
 
     void on_actionDark_Light_Mode_triggered();
 
+    void on_actionFont_Color_Preferences_triggered();
+
 private:
     Ui::MainWindow *ui;
     qint8 ModeBit = 0;   // 0 --> lightMode  1 --> darkMode

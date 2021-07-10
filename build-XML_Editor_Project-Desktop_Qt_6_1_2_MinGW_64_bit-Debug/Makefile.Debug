@@ -117,11 +117,15 @@ debug/qrc_resource.cpp: ../XML_Editor_Project/resource.qrc \
 		../XML_Editor_Project/icons/saveas.png \
 		../XML_Editor_Project/icons/undo.png \
 		../XML_Editor_Project/icons/floppy-disk.png \
+		../XML_Editor_Project/icons/font\ style\ 2.png \
 		../XML_Editor_Project/icons/cut2.png \
 		../XML_Editor_Project/icons/add-file.png \
 		../XML_Editor_Project/icons/copy.png \
+		../XML_Editor_Project/icons/font\ color.png \
+		../XML_Editor_Project/icons/dark\ light\ mode.png \
 		../XML_Editor_Project/icons/open.png \
 		../XML_Editor_Project/icons/copy2.png \
+		../XML_Editor_Project/icons/font\ style.png \
 		../XML_Editor_Project/icons/paste.png \
 		../XML_Editor_Project/icons/cut.png
 	C:\Qt\6.1.2\mingw81_64\bin\rcc.exe -name resource ..\XML_Editor_Project\resource.qrc -o debug\qrc_resource.cpp
@@ -602,7 +606,27 @@ debug/mainwindow.o: ../XML_Editor_Project/mainwindow.cpp ../XML_Editor_Project/m
 		C:/Qt/6.1.2/mingw81_64/include/QtWidgets/qlayout.h \
 		C:/Qt/6.1.2/mingw81_64/include/QtWidgets/qlayoutitem.h \
 		C:/Qt/6.1.2/mingw81_64/include/QtWidgets/qgridlayout.h \
-		C:/Qt/6.1.2/mingw81_64/include/QtWidgets/QWidget
+		C:/Qt/6.1.2/mingw81_64/include/QtWidgets/QWidget \
+		C:/Qt/6.1.2/mingw81_64/include/QtCore/QFile \
+		C:/Qt/6.1.2/mingw81_64/include/QtCore/qfile.h \
+		C:/Qt/6.1.2/mingw81_64/include/QtCore/qfiledevice.h \
+		C:/Qt/6.1.2/mingw81_64/include/QtWidgets/QFileDialog \
+		C:/Qt/6.1.2/mingw81_64/include/QtWidgets/qfiledialog.h \
+		C:/Qt/6.1.2/mingw81_64/include/QtCore/qdir.h \
+		C:/Qt/6.1.2/mingw81_64/include/QtCore/qfileinfo.h \
+		C:/Qt/6.1.2/mingw81_64/include/QtCore/qdatetime.h \
+		C:/Qt/6.1.2/mingw81_64/include/QtCore/qcalendar.h \
+		C:/Qt/6.1.2/mingw81_64/include/QtWidgets/qdialog.h \
+		C:/Qt/6.1.2/mingw81_64/include/QtCore/QDir \
+		C:/Qt/6.1.2/mingw81_64/include/QtCore/QTextStream \
+		C:/Qt/6.1.2/mingw81_64/include/QtWidgets/QMessageBox \
+		C:/Qt/6.1.2/mingw81_64/include/QtWidgets/qmessagebox.h \
+		C:/Qt/6.1.2/mingw81_64/include/QtGui/QFont \
+		C:/Qt/6.1.2/mingw81_64/include/QtWidgets/QFontDialog \
+		C:/Qt/6.1.2/mingw81_64/include/QtWidgets/qfontdialog.h \
+		C:/Qt/6.1.2/mingw81_64/include/QtGui/QColor \
+		C:/Qt/6.1.2/mingw81_64/include/QtWidgets/QColorDialog \
+		C:/Qt/6.1.2/mingw81_64/include/QtWidgets/qcolordialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\mainwindow.o ..\XML_Editor_Project\mainwindow.cpp
 
 debug/qrc_resource.o: debug/qrc_resource.cpp 
