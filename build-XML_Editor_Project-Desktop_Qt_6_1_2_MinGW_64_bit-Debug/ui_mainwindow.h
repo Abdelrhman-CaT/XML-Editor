@@ -35,6 +35,7 @@ public:
     QAction *actionPaste;
     QAction *actionUndo;
     QAction *actionRedo;
+    QAction *actionFont_Preferences;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
     QTextEdit *textEdit;
@@ -94,6 +95,8 @@ public:
         QIcon icon8;
         icon8.addFile(QString::fromUtf8(":/icons/icons/redo.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionRedo->setIcon(icon8);
+        actionFont_Preferences = new QAction(MainWindow);
+        actionFont_Preferences->setObjectName(QString::fromUtf8("actionFont_Preferences"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         verticalLayout = new QVBoxLayout(centralwidget);
@@ -132,6 +135,7 @@ public:
         menuEdit->addSeparator();
         menuEdit->addAction(actionUndo);
         menuEdit->addAction(actionRedo);
+        menuEdit->addAction(actionFont_Preferences);
         toolBar->addAction(actionNew);
         toolBar->addAction(actionOpen);
         toolBar->addAction(actionSave);
@@ -160,6 +164,7 @@ public:
         actionPaste->setText(QCoreApplication::translate("MainWindow", "Paste", nullptr));
         actionUndo->setText(QCoreApplication::translate("MainWindow", "Undo", nullptr));
         actionRedo->setText(QCoreApplication::translate("MainWindow", "Redo", nullptr));
+        actionFont_Preferences->setText(QCoreApplication::translate("MainWindow", "Font Preferences", nullptr));
         menuFile->setTitle(QCoreApplication::translate("MainWindow", "File", nullptr));
         menuEdit->setTitle(QCoreApplication::translate("MainWindow", "Edit", nullptr));
         toolBar->setWindowTitle(QCoreApplication::translate("MainWindow", "toolBar", nullptr));

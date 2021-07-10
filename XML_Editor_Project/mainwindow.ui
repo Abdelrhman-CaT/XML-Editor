@@ -49,6 +49,7 @@
     <addaction name="separator"/>
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
+    <addaction name="actionFont_Preferences"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -154,6 +155,11 @@
    </property>
    <property name="text">
     <string>Redo</string>
+   </property>
+  </action>
+  <action name="actionFont_Preferences">
+   <property name="text">
+    <string>Font Preferences</string>
    </property>
   </action>
  </widget>

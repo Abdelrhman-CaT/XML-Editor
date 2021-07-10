@@ -5,6 +5,8 @@
 #include "QDir"
 #include "QTextStream"
 #include "QMessageBox"
+#include "QFont"
+#include "QFontDialog"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -12,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     this->setCentralWidget(ui->textEdit);
+    ui->textEdit->setStyleSheet("font: 15pt 'Consolas';");
 }
 
 MainWindow::~MainWindow()
@@ -115,5 +118,18 @@ void MainWindow::on_actionUndo_triggered()
 void MainWindow::on_actionRedo_triggered()
 {
     ui->textEdit->redo();
+}
+
+
+void MainWindow::on_actionFont_Preferences_triggered()
+{
+    bool ok;
+    QFont font = QFontDialog::getFont(&ok, this);
+    if(ok){
+        ui->textEdit->setFont(font);
+    }
+    else{
+        return;
+    }
 }
 
