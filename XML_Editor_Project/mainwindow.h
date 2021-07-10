@@ -36,5 +36,6 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    QString fpath = "";
 };
 #endif // MAINWINDOW_H

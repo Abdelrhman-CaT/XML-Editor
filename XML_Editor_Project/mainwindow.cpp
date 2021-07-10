@@ -1,5 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "QFile"
+#include "QFileDialog"
+#include "QDir"
+#include "QTextStream"
+#include "QMessageBox"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -17,25 +22,69 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionNew_triggered()
 {
-
+    fpath = "";
+    ui->textEdit->setText("");
 }
 
 
 void MainWindow::on_actionOpen_triggered()
 {
-
+    QString filter = "All Files *.* ;; XML *.xml ;; JSON *.json";
+    QString filename = QFileDialog::getOpenFileName(this, "Open a File", QDir::currentPath(), filter);
+    fpath = filename;
+    QFile file(filename);
+    if(!file.open(QFile::ReadOnly | QFile::Text)){
+        QMessageBox::warning(this, "Warning", "Cannot Open File!");
+        return;
+    }
+    else{
+        QTextStream in(&file);
+        QString file_text = in.readAll();
+        ui->textEdit->setText(file_text);
+        file.close();
+    }
 }
 
 
 void MainWindow::on_actionSave_triggered()
 {
-
+    QString filename = fpath;
+    if(filename == ""){
+        on_actionSave_As_triggered();
+    }
+    else{
+        QFile file(filename);
+        if(!file.open(QFile::WriteOnly | QFile::Text)){
+            QMessageBox::warning(this, "Warning", "Cannot Save File!");
+            return;
+        }
+        else{
+            QTextStream out(&file);
+            QString file_text = ui->textEdit->toPlainText();
+            out << file_text;
+            file.flush();
+            file.close();
+        }
+    }
 }
 
 
 void MainWindow::on_actionSave_As_triggered()
 {
-
+    QString filename = QFileDialog::getSaveFileName(this, "Open a File", QDir::currentPath());
+    fpath = filename;
+    QFile file(filename);
+    if(!file.open(QFile::WriteOnly | QFile::Text)){
+        QMessageBox::warning(this, "Warning", "Cannot Save File!");
+        return;
+    }
+    else{
+        QTextStream out(&file);
+        QString file_text = ui->textEdit->toPlainText();
+        out << file_text;
+        file.flush();
+        file.close();
+    }
 }
 
 
