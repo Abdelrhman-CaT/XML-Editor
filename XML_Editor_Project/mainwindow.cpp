@@ -7,6 +7,8 @@
 #include "QMessageBox"
 #include "QFont"
 #include "QFontDialog"
+#include "QColor"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -130,6 +132,20 @@ void MainWindow::on_actionFont_Preferences_triggered()
     }
     else{
         return;
+    }
+}
+
+
+void MainWindow::on_actionDark_Light_Mode_triggered()
+{
+    if(ModeBit == 0){   // current mode: light. Switch to dark
+        ui->textEdit->setStyleSheet("background-color: #404040; font: 15pt 'Consolas'; color: 'white';");
+        //ui->textEdit->setTextColor(QColor());
+        ModeBit = 1;
+    }
+    else if(ModeBit == 1){ // current mode: dark. Switch to light
+        ui->textEdit->setStyleSheet("background-color: 'white'; font: 15pt 'Consolas'; color: 'black';");
+        ModeBit = 0;
     }
 }
 

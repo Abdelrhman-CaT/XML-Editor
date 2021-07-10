@@ -50,6 +50,7 @@
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
     <addaction name="actionFont_Preferences"/>
+    <addaction name="actionDark_Light_Mode"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -160,6 +161,11 @@
   <action name="actionFont_Preferences">
    <property name="text">
     <string>Font Preferences</string>
+   </property>
+  </action>
+  <action name="actionDark_Light_Mode">
+   <property name="text">
+    <string>Dark / Light Mode</string>
    </property>
   </action>
  </widget>

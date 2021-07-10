@@ -36,6 +36,7 @@ public:
     QAction *actionUndo;
     QAction *actionRedo;
     QAction *actionFont_Preferences;
+    QAction *actionDark_Light_Mode;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
     QTextEdit *textEdit;
@@ -97,6 +98,8 @@ public:
         actionRedo->setIcon(icon8);
         actionFont_Preferences = new QAction(MainWindow);
         actionFont_Preferences->setObjectName(QString::fromUtf8("actionFont_Preferences"));
+        actionDark_Light_Mode = new QAction(MainWindow);
+        actionDark_Light_Mode->setObjectName(QString::fromUtf8("actionDark_Light_Mode"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         verticalLayout = new QVBoxLayout(centralwidget);
@@ -136,6 +139,7 @@ public:
         menuEdit->addAction(actionUndo);
         menuEdit->addAction(actionRedo);
         menuEdit->addAction(actionFont_Preferences);
+        menuEdit->addAction(actionDark_Light_Mode);
         toolBar->addAction(actionNew);
         toolBar->addAction(actionOpen);
         toolBar->addAction(actionSave);
@@ -165,6 +169,7 @@ public:
         actionUndo->setText(QCoreApplication::translate("MainWindow", "Undo", nullptr));
         actionRedo->setText(QCoreApplication::translate("MainWindow", "Redo", nullptr));
         actionFont_Preferences->setText(QCoreApplication::translate("MainWindow", "Font Preferences", nullptr));
+        actionDark_Light_Mode->setText(QCoreApplication::translate("MainWindow", "Dark / Light Mode", nullptr));
         menuFile->setTitle(QCoreApplication::translate("MainWindow", "File", nullptr));
         menuEdit->setTitle(QCoreApplication::translate("MainWindow", "Edit", nullptr));
         toolBar->setWindowTitle(QCoreApplication::translate("MainWindow", "toolBar", nullptr));

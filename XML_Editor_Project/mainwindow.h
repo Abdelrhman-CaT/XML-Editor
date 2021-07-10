@@ -36,8 +36,11 @@ private slots:
 
     void on_actionFont_Preferences_triggered();
 
+    void on_actionDark_Light_Mode_triggered();
+
 private:
     Ui::MainWindow *ui;
+    qint8 ModeBit = 0;   // 0 --> lightMode  1 --> darkMode
     QString fpath = "";
 };
 #endif // MAINWINDOW_H
