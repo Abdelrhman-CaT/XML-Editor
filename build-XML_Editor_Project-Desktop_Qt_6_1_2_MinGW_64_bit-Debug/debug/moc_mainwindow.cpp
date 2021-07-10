@@ -116,7 +116,6 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 6: _t->on_actionPaste_triggered(); break;
         case 7: _t->on_actionUndo_triggered(); break;
         case 8: _t->on_actionRedo_triggered(); break;
-        case 9: _t->on_actionFont_Preferences_triggered(); break;
         case 10: _t->on_actionDark_Light_Mode_triggered(); break;
         case 11: _t->on_actionFont_Color_Preferences_triggered(); break;
         default: ;

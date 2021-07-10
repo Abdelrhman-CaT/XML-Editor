@@ -49,7 +49,6 @@
     <addaction name="separator"/>
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
-    <addaction name="actionFont_Preferences"/>
     <addaction name="actionFont_Color_Preferences"/>
     <addaction name="actionDark_Light_Mode"/>
    </widget>
@@ -157,15 +156,6 @@
    </property>
    <property name="text">
     <string>Redo</string>
-   </property>
-  </action>
-  <action name="actionFont_Preferences">
-   <property name="icon">
-    <iconset resource="resource.qrc">
-     <normaloff>:/icons/icons/font style.png</normaloff>:/icons/icons/font style.png</iconset>
-   </property>
-   <property name="text">
-    <string>Font Style Preferences</string>
    </property>
   </action>
   <action name="actionDark_Light_Mode">

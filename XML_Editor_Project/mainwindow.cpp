@@ -122,7 +122,7 @@ void MainWindow::on_actionRedo_triggered()
     ui->textEdit->redo();
 }
 
-
+/*
 void MainWindow::on_actionFont_Preferences_triggered()
 {
     bool ok;
@@ -134,7 +134,7 @@ void MainWindow::on_actionFont_Preferences_triggered()
         return;
     }
 }
-
+*/
 
 void MainWindow::on_actionDark_Light_Mode_triggered()
 {
