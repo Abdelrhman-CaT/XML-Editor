@@ -52,11 +52,20 @@
     <addaction name="separator"/>
     <addaction name="actionFont_Color_Preferences"/>
     <addaction name="actionDark_Light_mode"/>
-    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionCheck_XML_Consistency"/>
     <addaction name="actionMinify"/>
+    <addaction name="actionPrettify_XML"/>
+    <addaction name="actionConvert_to_JSON"/>
+    <addaction name="actionCompress_Data"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuTools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -83,7 +92,11 @@
    <addaction name="actionFont_Color_Preferences"/>
    <addaction name="actionDark_Light_mode"/>
    <addaction name="separator"/>
+   <addaction name="actionCheck_XML_Consistency"/>
    <addaction name="actionMinify"/>
+   <addaction name="actionPrettify_XML"/>
+   <addaction name="actionConvert_to_JSON"/>
+   <addaction name="actionCompress_Data"/>
   </widget>
   <action name="actionNew">
    <property name="icon">
@@ -194,6 +207,42 @@
    </property>
    <property name="toolTip">
     <string>Minify XML</string>
+   </property>
+  </action>
+  <action name="actionCheck_XML_Consistency">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/icons/cons.png</normaloff>:/icons/icons/cons.png</iconset>
+   </property>
+   <property name="text">
+    <string>Check XML Consistency</string>
+   </property>
+  </action>
+  <action name="actionPrettify_XML">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/icons/check consistency.png</normaloff>:/icons/icons/check consistency.png</iconset>
+   </property>
+   <property name="text">
+    <string>Prettify XML</string>
+   </property>
+  </action>
+  <action name="actionConvert_to_JSON">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/icons/to json.png</normaloff>:/icons/icons/to json.png</iconset>
+   </property>
+   <property name="text">
+    <string>Convert to JSON</string>
+   </property>
+  </action>
+  <action name="actionCompress_Data">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/icons/compress.png</normaloff>:/icons/icons/compress.png</iconset>
+   </property>
+   <property name="text">
+    <string>Compress Data</string>
    </property>
   </action>
  </widget>

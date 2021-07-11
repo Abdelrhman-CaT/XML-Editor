@@ -18,5 +18,8 @@
         <file>icons/undo.png</file>
         <file>icons/compress.png</file>
         <file>icons/minify.png</file>
+        <file>icons/check consistency.png</file>
+        <file>icons/to json.png</file>
+        <file>icons/cons.png</file>
     </qresource>
 </RCC>
