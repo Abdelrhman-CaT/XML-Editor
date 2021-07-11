@@ -52,20 +52,28 @@ void Editor::on_actionOpen_triggered()
             QString temp = in.readLine();
             file_text += temp;
             file_text += "\n";
-            lines.push_back(temp);
+            if(temp != ""){
+                lines.push_back(temp);
+            }
         }
         ui->textEdit->setText(file_text);
         file.close();
         ui->statusbar->showMessage("This File has " + QString::number(num_of_lines) + " Lines", 3000);
         for(int i=0; i<lines.size(); i++){
             QString line = lines[i];
-            qint32 index = 0;
             qint32 j = 0;
-            while(line[j] == ' '){
-                index += 1;
+            while(line[j] == ' ' || line[j] == '\t'){
                 j += 1;
             }
-            lines[i] = line.mid(j);
+            qint32 k = line.length() - 1;
+            while(line[k] == ' ' || line[k] == '\t') {
+                k -= 1;
+            }
+            QString line_without_pre_or_post_spaces = "";
+            for(int q = j ; q <= k; q++){
+                line_without_pre_or_post_spaces += line[q];
+            }
+            lines[i] = line_without_pre_or_post_spaces;
             //qDebug() << lines[i];
         }
     }
@@ -179,7 +187,7 @@ void Editor::on_actionMinify_triggered()
             if(in[i] != '\n'){
                 temp_chars += in[i];
             }
-            else if(in[i] == '\n'){
+            else if(in[i] == '\n' && temp_chars != ""){
                 temp.push_back(temp_chars);
                 temp_chars = "";
             }
@@ -189,13 +197,21 @@ void Editor::on_actionMinify_triggered()
 
         for(int i=0; i<temp.size(); i++){
             QString line = temp[i];
-            qint32 index = 0;
+
+
             qint32 j = 0;
-            while(line[j] == ' '){
-                index += 1;
+            while(line[j] == ' ' || line[j] == '\t'){
                 j += 1;
             }
-            temp[i] = line.mid(j);
+            qint32 k = line.length() - 1;
+            while(line[k] == ' ' || line[k] == '\t') {
+                k -= 1;
+            }
+            QString line_without_pre_or_post_spaces = "";
+            for(int q = j ; q <= k; q++){
+                line_without_pre_or_post_spaces += line[q];
+            }
+            temp[i] = line_without_pre_or_post_spaces;
             out += temp[i];
         }
     }
