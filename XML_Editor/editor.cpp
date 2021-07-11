@@ -1,5 +1,7 @@
 #include "editor.h"
 #include "ui_editor.h"
+#include "xml_vector.h"
+#include "consistency_check.h"
 #include "QFile"
 #include "QFileDialog"
 #include "QDir"
@@ -9,8 +11,6 @@
 #include "QFontDialog"
 #include "QColor"
 #include "QColorDialog"
-#include "QVector"
-#include "QStack"
 #include "QTextEdit"
 
 //---------------------------------------------------------------------------------------------------------------------------
@@ -24,6 +24,7 @@ Editor::Editor(QWidget *parent)
     ui->textEdit->setStyleSheet("font: 11pt 'Consolas';");
     ui->actionUndo->setDisabled(true);
     ui->actionRedo->setDisabled(true);
+    on_actionDark_Light_mode_triggered(); // To make Dark mode the default mode
 }
 
 Editor::~Editor()
@@ -208,76 +209,6 @@ void Editor::on_textEdit_textChanged()
 
 
 //---------------------------------------------------------------------------------------------------------------------------
-// create XML vector out of XML file
-QString remove_pre_post_spaces(QString line){
-    qint32 j = 0;
-    while(line[j] == ' ' || line[j] == '\t' || line[j] == '\n'){
-        j += 1;
-    }
-    qint32 k = line.length() - 1;
-    while(line[k] == ' ' || line[k] == '\t' || line[k] == '\n') {
-        k -= 1;
-    }
-    QString line_without_pre_or_post_spaces = "";
-    for(int q = j ; q <= k; q++){
-        line_without_pre_or_post_spaces += line[q];
-    }
-    return line_without_pre_or_post_spaces;
-}
-
-QVector<QString> create_xml_vector(QString in){
-    QVector<QString> res;
-    QString temp = "";
-    int i = 0;
-    while(i < in.length()){
-        if(in[i] == '<'){
-            while(i < in.length()){
-                if(in[i] != '>'){
-                    temp += in[i];
-                }
-                else{
-                    break;
-                }
-                i++;
-            }
-            temp += '>';
-            temp = remove_pre_post_spaces(temp);
-            i++;
-            res.push_back(temp);
-            temp = "";
-        }
-        else{
-            while(i < in.length()) {
-                if(in[i] != '<'){
-                    temp += in[i];
-                }
-                else{
-                    break;
-                }
-                i++;
-            }
-            bool add = false;
-            for(int j=0; j<temp.length(); j++){
-                if(temp[j] != ' ' && temp[j] != '\n' && temp[j] != '\t'){
-                    add = true;
-                    break;
-                }
-            }
-            if(add == true){
-                temp = remove_pre_post_spaces(temp);
-                res.push_back(temp);
-            }
-            temp = "";
-        }
-    }
-    return res;
-}
-//---------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-//---------------------------------------------------------------------------------------------------------------------------
 // Font Color, Dark Mode
 void Editor::on_actionFont_Color_Preferences_triggered()
 {
@@ -350,52 +281,6 @@ void Editor::on_actionMinify_triggered()
 
 
 //---------------------------------------------------------------------------------------------------------------------------
-// XML Consistency Check. Returns a boolean value whether the file is XML-consistent or not
-bool check_consistency(QVector<QString> xml){
-    QStack<QString> tag;
-        for (int i = 0; i < xml.size(); i++) {
-            QString line = xml[i];
-            if (line[0] == '<') {
-                if (line[1] == '/') {
-                    if(!tag.empty()){
-                        if (line != ("</" + tag.top())) {
-                            // unmatched closing and opening tags
-                            return false;
-                        }
-                        else {
-                            tag.pop();
-                        }
-                    }
-                    else{
-                        // closing tag without opening tag
-                        return false;
-                    }
-                }
-                else if(line[1] != '!' && line[1] != '?') {
-                    if(!(line[line.length()-2] == '/' && line[line.length()-1] == '>')){
-                        QString temp = "";
-                        for(int j=1; j<line.length(); j++){
-                            if(line[j] != ' ' && line[j] != '>'){
-                             temp += line[j];
-                            }
-                            else{
-                                temp += '>';
-                                break;
-                            }
-                        }
-                        tag.push(temp);
-                    }
-                }
-            }
-        }
-    return (tag.empty());
-}
-//---------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-//---------------------------------------------------------------------------------------------------------------------------
 // Prettify XML - XML Prettification - Beauitfy XML - XML Beautification
 // Dependant on check_consistency() boolean return
 // Current indentation: Five Spaces
@@ -456,6 +341,11 @@ void Editor::on_actionPrettify_XML_triggered()
         return;
     }
 }
+//---------------------------------------------------------------------------------------------------------------------------
+
+
+
+
 //---------------------------------------------------------------------------------------------------------------------------
 // NOT COMPLETED, you must show the errors and fix them
 void Editor::on_actionCheck_XML_Consistency_triggered()
