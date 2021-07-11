@@ -35,6 +35,61 @@ void Editor::on_actionNew_triggered()
     //qDebug() << lines.size();
 }
 
+QString remove_pre_post_spaces(QString line){
+    qint32 j = 0;
+    while(line[j] == ' ' || line[j] == '\t' || line[j] == '\n'){
+        j += 1;
+    }
+    qint32 k = line.length() - 1;
+    while(line[k] == ' ' || line[k] == '\t' || line[k] == '\n') {
+        k -= 1;
+    }
+    QString line_without_pre_or_post_spaces = "";
+    for(int q = j ; q <= k; q++){
+        line_without_pre_or_post_spaces += line[q];
+    }
+    return line_without_pre_or_post_spaces;
+}
+
+QVector<QString> create_xml_vector(QString in){
+    QVector<QString> res;
+    QString temp = "";
+    int i = 0;
+    while(i < in.length()){
+        if(in[i] == '<'){
+            while(in[i] != '>' && i < in.length()){
+                temp += in[i];
+                i++;
+            }
+            temp += '>';
+            temp = remove_pre_post_spaces(temp);
+            i++;
+            res.push_back(temp);
+            temp = "";
+        }
+        else{
+            while(in[i] != '<' && i < in.length()) {
+                temp += in[i];
+                i++;
+            }
+            bool add = false;
+            for(int j=0; j<temp.length(); j++){
+                if(temp[j] != ' ' && temp[j] != '\n' && temp[j] != '\t'){
+                    add = true;
+                    break;
+                }
+            }
+            if(add == true){
+                temp = remove_pre_post_spaces(temp);
+                res.push_back(temp);
+            }
+            temp = "";
+        }
+    }
+    return res;
+}
+
+
 void Editor::on_actionOpen_triggered()
 {
     QString filter = "All Files *.* ;; XML *.xml ;; JSON *.json";
@@ -48,39 +103,19 @@ void Editor::on_actionOpen_triggered()
     else{
         QTextStream in(&file);
         QString file_text = "";
-        qint32 num_of_lines = 0;
         if(!lines.empty()){
             lines.erase(lines.begin(), lines.end());
         }
-        while(!in.atEnd()){
-            num_of_lines +=1;
-            QString temp = in.readLine();
-            file_text += temp;
-            file_text += "\n";
-            if(temp != ""){
-                lines.push_back(temp);
-            }
-        }
+        file_text = in.readAll();
         ui->textEdit->setText(file_text);
-        file.close();
-        ui->statusbar->showMessage("This File has " + QString::number(num_of_lines) + " Lines", 3000);
-        for(int i=0; i<lines.size(); i++){
-            QString line = lines[i];
-            qint32 j = 0;
-            while(line[j] == ' ' || line[j] == '\t'){
-                j += 1;
-            }
-            qint32 k = line.length() - 1;
-            while(line[k] == ' ' || line[k] == '\t') {
-                k -= 1;
-            }
-            QString line_without_pre_or_post_spaces = "";
-            for(int q = j ; q <= k; q++){
-                line_without_pre_or_post_spaces += line[q];
-            }
-            lines[i] = line_without_pre_or_post_spaces;
-            //qDebug() << lines[i];
+        file.close();  
+        lines = create_xml_vector(file_text);
+
+        /*
+        for(int i=0; i<lines.length(); i++){
+            qDebug() << lines[i];
         }
+        */
     }
 }
 
@@ -181,37 +216,6 @@ void Editor::on_actionDark_Light_mode_triggered()
     }
 }
 
-QVector<QString> create_lines_typed(QString in){
-    QString temp_chars = "";
-    QVector<QString> temp;
-    for(int i=0; i<in.length(); i++){
-        if(in[i] != '\n'){
-            temp_chars += in[i];
-        }
-        else if(in[i] == '\n' && temp_chars != ""){
-            temp.push_back(temp_chars);
-            temp_chars = "";
-        }
-    }
-    temp.push_back(temp_chars);
-    for(int i=0; i<temp.size(); i++){
-        QString line = temp[i];
-        qint32 j = 0;
-        while(line[j] == ' ' || line[j] == '\t'){
-            j += 1;
-        }
-        qint32 k = line.length() - 1;
-        while(line[k] == ' ' || line[k] == '\t') {
-            k -= 1;
-        }
-        QString line_without_pre_or_post_spaces = "";
-        for(int q = j ; q <= k; q++){
-            line_without_pre_or_post_spaces += line[q];
-        }
-        temp[i] = line_without_pre_or_post_spaces;
-    }
-    return temp;
-}
 
 void Editor::on_actionMinify_triggered()
 {
@@ -220,9 +224,11 @@ void Editor::on_actionMinify_triggered()
     if(lines.empty()){
         QString in = ui->textEdit->toPlainText();
         if(in != ""){
-            QVector<QString> lines_typed = create_lines_typed(in);
-            for(int i=0; i< lines_typed.size(); i++){
-                out += lines_typed[i];
+            lines = create_xml_vector(in);
+            for(int i=0; i<lines.size(); i++){
+                if(!(lines[i][0] == '<' && lines[i][1] == '!')){
+                    out += lines[i];
+                }
             }
         }
         else{
@@ -231,15 +237,84 @@ void Editor::on_actionMinify_triggered()
     }
     else{
         for(int i=0; i<lines.size(); i++){
-            out += lines[i];
+            if(!(lines[i][0] == '<' && lines[i][1] == '!')){
+                out += lines[i];
+            }
         }
     }
     ui->textEdit->setText(out);
 }
 
 
+bool check_consistency(QVector<QString> xml){
+    QStack<QString> tag;
+        for (int i = 0; i < xml.size(); i++) {
+            QString line = xml[i];
+            if (line[0] == '<') {
+                if (line[1] == '/') {
+                    if (line != ("</" + tag.top())) {
+                        return false;
+                    }
+                    else {
+                        tag.pop();
+                    }
+                }
+                else if(line[1] != '!' && line[1] != '?') {
+                    if(!(line[line.length()-2] == '/' && line[line.length()-1] == '>')){
+                        QString temp = "";
+                        for(int j=1; j<line.length(); j++){
+                            if(line[j] != ' ' && line[j] != '>'){
+                             temp += line[j];
+                            }
+                            else{
+                                temp += '>';
+                                break;
+                            }
+                        }
+                        tag.push(temp);
+                    }
+                }
+            }
+        }
+    return tag.empty();
+}
+
+
+
 void Editor::on_actionCheck_XML_Consistency_triggered()
 {
-
+    bool message;
+    if(lines.empty()){
+        QString in = ui->textEdit->toPlainText();
+        if(in != ""){
+            lines = create_xml_vector(in);
+            // check for consistency in lines_typed
+            /*
+             for(int i=0; i<lines.length(); i++){
+                qDebug() << lines[i];
+             }
+            */
+            message = check_consistency(lines);
+        }
+        else{
+            QMessageBox::warning(this, "Warning", "No Text To Be Checked!");
+            return;
+        }
+    }
+    else{
+        // check for consistency through lines
+        /*
+         for(int i=0; i<lines.length(); i++){
+            qDebug() << lines[i];
+         }
+        */
+        message = check_consistency(lines);
+    }
+    if(message == true){
+        QMessageBox::information(this, "Info", "This XML file is consistent");
+    }
+    else{
+        QMessageBox::warning(this, "Warning", "This XML file is NOT consistent");
+    }
 }
 
