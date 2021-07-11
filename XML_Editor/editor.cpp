@@ -11,6 +11,7 @@
 #include "QColorDialog"
 #include "QVector"
 #include "QStack"
+#include "QAction"
 
 Editor::Editor(QWidget *parent)
     : QMainWindow(parent)
@@ -19,6 +20,8 @@ Editor::Editor(QWidget *parent)
     ui->setupUi(this);
     this->setCentralWidget(ui->textEdit);
     ui->textEdit->setStyleSheet("font: 11pt 'Consolas';");
+    ui->actionUndo->setDisabled(true);
+    ui->actionRedo->setDisabled(true);
 }
 
 Editor::~Editor()
@@ -185,9 +188,21 @@ void Editor::on_actionUndo_triggered()
 }
 
 
+void Editor::on_textEdit_undoAvailable(bool b)
+{
+    ui->actionUndo->setDisabled(!b);
+}
+
+
 void Editor::on_actionRedo_triggered()
 {
     ui->textEdit->redo();
+}
+
+
+void Editor::on_textEdit_redoAvailable(bool b)
+{
+    ui->actionRedo->setDisabled(!b);
 }
 
 
@@ -317,4 +332,5 @@ void Editor::on_actionCheck_XML_Consistency_triggered()
         QMessageBox::warning(this, "Warning", "This XML file is NOT consistent");
     }
 }
+
 

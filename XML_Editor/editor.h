@@ -42,6 +42,10 @@ private slots:
 
     void on_actionCheck_XML_Consistency_triggered();
 
+    void on_textEdit_undoAvailable(bool b);
+
+    void on_textEdit_redoAvailable(bool b);
+
 private:
     Ui::Editor *ui;
     qint8 ModeBit = 0;   // 0 --> lightMode  1 --> darkMode
