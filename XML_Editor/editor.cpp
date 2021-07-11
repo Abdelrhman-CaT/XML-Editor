@@ -11,7 +11,7 @@
 #include "QColorDialog"
 #include "QVector"
 #include "QStack"
-#include "QAction"
+#include "QTextEdit"
 
 Editor::Editor(QWidget *parent)
     : QMainWindow(parent)
@@ -34,6 +34,7 @@ void Editor::on_actionNew_triggered()
 {
     fpath = "";
     ui->textEdit->setText("");
+    ui->statusbar->showMessage("");
     lines.erase(lines.begin(), lines.end());
     //qDebug() << lines.size();
 }
@@ -105,6 +106,8 @@ QVector<QString> create_xml_vector(QString in){
 
 void Editor::on_actionOpen_triggered()
 {
+    ui->statusbar->showMessage("");
+    ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
     QString filter = "All Files *.* ;; XML *.xml ;; JSON *.json";
     QString filename = QFileDialog::getOpenFileName(this, "Open a File", QDir::currentPath(), filter);
     fpath = filename;
@@ -122,6 +125,7 @@ void Editor::on_actionOpen_triggered()
         file_text = in.readAll();
         ui->textEdit->setText(file_text);
         file.close();  
+        ui->statusbar->showMessage("Done!");
         //lines = create_xml_vector(file_text);
 
         /*
@@ -135,6 +139,7 @@ void Editor::on_actionOpen_triggered()
 
 void Editor::on_actionSave_triggered()
 {
+    ui->statusbar->showMessage("");
     QString filename = fpath;
     if(filename == ""){
         on_actionSave_As_triggered();
@@ -151,6 +156,7 @@ void Editor::on_actionSave_triggered()
             out << file_text;
             file.flush();
             file.close();
+            ui->statusbar->showMessage("Done!");
         }
     }
 }
@@ -158,6 +164,7 @@ void Editor::on_actionSave_triggered()
 
 void Editor::on_actionSave_As_triggered()
 {
+    ui->statusbar->showMessage("");
     QString filename = QFileDialog::getSaveFileName(this, "Open a File", QDir::currentPath());
     fpath = filename;
     QFile file(filename);
@@ -171,30 +178,39 @@ void Editor::on_actionSave_As_triggered()
         out << file_text;
         file.flush();
         file.close();
+        ui->statusbar->showMessage("Done!");
     }
 }
 
 
 void Editor::on_actionCut_triggered()
 {
+    ui->statusbar->showMessage("");
     ui->textEdit->cut();
+    ui->statusbar->showMessage("Done!");
 }
 
 
 void Editor::on_actionCopy_triggered()
 {
+    ui->statusbar->showMessage("");
     ui->textEdit->copy();
+    ui->statusbar->showMessage("Done!");
 }
 
 void Editor::on_actionPaste_triggered()
 {
+    ui->statusbar->showMessage("");
     ui->textEdit->paste();
+    ui->statusbar->showMessage("Done!");
 }
 
 
 void Editor::on_actionUndo_triggered()
 {
+    ui->statusbar->showMessage("");
     ui->textEdit->undo();
+    ui->statusbar->showMessage("Done!");
 }
 
 
@@ -206,7 +222,9 @@ void Editor::on_textEdit_undoAvailable(bool b)
 
 void Editor::on_actionRedo_triggered()
 {
+    ui->statusbar->showMessage("");
     ui->textEdit->redo();
+    ui->statusbar->showMessage("Done!");
 }
 
 
@@ -244,6 +262,7 @@ void Editor::on_actionDark_Light_mode_triggered()
 
 void Editor::on_textEdit_textChanged()
 {
+    /*
     qint32 num_of_lines = 0;
     QString text = ui->textEdit->toPlainText();
     for(int i=0; i<text.length(); i++){
@@ -252,15 +271,19 @@ void Editor::on_textEdit_textChanged()
         }
     }
     ui->statusbar->showMessage(QString::number(num_of_lines+1)+" Lines.");
+    */
     if(lines.size() > 0){
         lines.erase(lines.begin(), lines.end());
     }
+    ui->statusbar->showMessage("");
 }
 
 
 void Editor::on_actionMinify_triggered()
 {
     //qDebug() << lines.size();
+    ui->statusbar->showMessage("");
+    ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
     QString out = "";
     if(lines.empty()){
         QString in = ui->textEdit->toPlainText();
@@ -289,23 +312,28 @@ void Editor::on_actionMinify_triggered()
         }
     }
     ui->textEdit->setText(out);
+    ui->statusbar->showMessage("Done!");
 }
 
 
-bool check_consistency(QVector<QString> xml, QVector<int> *error_line_num, QVector<QString> *supposed_value_for_the_line){
+bool check_consistency(QVector<QString> xml){
     QStack<QString> tag;
-    bool consistent = true;
         for (int i = 0; i < xml.size(); i++) {
             QString line = xml[i];
             if (line[0] == '<') {
                 if (line[1] == '/') {
-                    if (line != ("</" + tag.top())) {
-                        consistent = false;
-                        error_line_num->push_back(i);
-                        supposed_value_for_the_line->push_back("</" + tag.top());
+                    if(!tag.empty()){
+                        if (line != ("</" + tag.top())) {
+                            // unmatched closing and opening tags
+                            return false;
+                        }
+                        else {
+                            tag.pop();
+                        }
                     }
-                    else {
-                        tag.pop();
+                    else{
+                        // closing tag without opening tag
+                        return false;
                     }
                 }
                 else if(line[1] != '!' && line[1] != '?') {
@@ -325,15 +353,69 @@ bool check_consistency(QVector<QString> xml, QVector<int> *error_line_num, QVect
                 }
             }
         }
-    return (tag.empty() && consistent);
+    return (tag.empty());
 }
 
+QString remove_one_indentation(QString str){
+    QString temp = "";
+    for(int i=0; i<str.length()-1;i++){
+        temp += str[i];
+    }
+    return temp;
+}
 
+void Editor::on_actionPrettify_XML_triggered()
+{
+    ui->statusbar->showMessage("");
+    ui->textEdit->setLineWrapMode(QTextEdit::NoWrap);
+    if(lines.size() == 0){
+        lines = create_xml_vector(ui->textEdit->toPlainText());
+    }
+    if(check_consistency(lines)){
+        QString indent = "";
+        QString final = "";
+        for(int i=0; i<lines.size(); i++){
+           QString line = lines[i];
+           if(line[0] == '<'){
+               if(line[1] == '/'){
+                    indent = remove_one_indentation(indent);
+                    final += indent+line;
+                    final += "\n";
+               }
+               else if(line[1] != '!' && line[1] != '?'){
+                   if(!(line[line.length()-2] == '/' && line[line.length()-1] == '>')){
+                       final += indent+line;
+                       final += "\n";
+                       indent += "\t";
+                   }
+                   else{
+                       final += indent+line;
+                       final += "\n";
+                   }
+               }
+               else{
+                   final += indent+line;
+                   final += "\n";
+               }
+           }
+           else{
+               final += indent+line;
+               final += "\n";
+           }
+        }
+        ui->textEdit->setText(final);
+        ui->statusbar->showMessage("Done!");
+    }
+    else{
+        QMessageBox::warning(this, "Warning", "Cannot Prettify an Unconsistent XML file!");
+        return;
+    }
+}
 
 void Editor::on_actionCheck_XML_Consistency_triggered()
 {
-    QVector<int> error_line_num;
-    QVector<QString> supposed_value_for_the_line;
+    ui->statusbar->showMessage("");
+    ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
     bool message;
     if(lines.empty()){
         QString in = ui->textEdit->toPlainText();
@@ -345,7 +427,7 @@ void Editor::on_actionCheck_XML_Consistency_triggered()
                 qDebug() << lines[i];
              }
             */
-            message = check_consistency(lines, &error_line_num, &supposed_value_for_the_line);
+            message = check_consistency(lines);
         }
         else{
             QMessageBox::warning(this, "Warning", "No Text To Be Checked!");
@@ -359,16 +441,14 @@ void Editor::on_actionCheck_XML_Consistency_triggered()
             qDebug() << lines[i];
          }
         */
-        message = check_consistency(lines, &error_line_num, &supposed_value_for_the_line);
+        message = check_consistency(lines);
     }
     if(message == true){
         QMessageBox::information(this, "Info", "This XML file is consistent");
+        ui->statusbar->showMessage("Done!");
     }
     else{
         QMessageBox::warning(this, "Warning", "This XML file is NOT consistent");
-        for(int i=0; i<error_line_num.length(); i++){
-            qDebug() << error_line_num[i] << " " << supposed_value_for_the_line[i];
-        }
+        return;
     }
 }
-

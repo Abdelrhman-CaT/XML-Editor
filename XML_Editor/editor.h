@@ -48,6 +48,8 @@ private slots:
 
     void on_textEdit_textChanged();
 
+    void on_actionPrettify_XML_triggered();
+
 private:
     Ui::Editor *ui;
     qint8 ModeBit = 0;   // 0 --> lightMode  1 --> darkMode
