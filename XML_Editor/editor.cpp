@@ -13,6 +13,8 @@
 #include "QStack"
 #include "QTextEdit"
 
+//---------------------------------------------------------------------------------------------------------------------------
+// Initialization
 Editor::Editor(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::Editor)
@@ -28,8 +30,14 @@ Editor::~Editor()
 {
     delete ui;
 }
+//---------------------------------------------------------------------------------------------------------------------------
 
 
+
+
+
+//---------------------------------------------------------------------------------------------------------------------------
+// New, Open, Save, Save As
 void Editor::on_actionNew_triggered()
 {
     fpath = "";
@@ -39,6 +47,168 @@ void Editor::on_actionNew_triggered()
     //qDebug() << lines.size();
 }
 
+void Editor::on_actionOpen_triggered()
+{
+    ui->statusbar->showMessage("");
+    ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
+    QString filter = "All Files *.* ;; XML *.xml ;; JSON *.json";
+    QString filename = QFileDialog::getOpenFileName(this, "Open a File", QDir::currentPath(), filter);
+    fpath = filename;
+    QFile file(filename);
+    if(!file.open(QFile::ReadOnly | QFile::Text)){
+        QMessageBox::warning(this, "Warning", "Cannot Open File!");
+        return;
+    }
+    else{
+        QTextStream in(&file);
+        QString file_text = "";
+        if(!lines.empty()){
+            lines.erase(lines.begin(), lines.end());
+        }
+        file_text = in.readAll();
+        ui->textEdit->setText(file_text);
+        file.close();
+        ui->statusbar->showMessage("Done!");
+        //lines = create_xml_vector(file_text);
+
+        /*
+        for(int i=0; i<lines.length(); i++){
+            qDebug() << lines[i];
+        }
+        */
+    }
+}
+
+void Editor::on_actionSave_triggered()
+{
+    ui->statusbar->showMessage("");
+    QString filename = fpath;
+    if(filename == ""){
+        on_actionSave_As_triggered();
+    }
+    else{
+        QFile file(filename);
+        if(!file.open(QFile::WriteOnly | QFile::Text)){
+            QMessageBox::warning(this, "Warning", "Cannot Save File!");
+            return;
+        }
+        else{
+            QTextStream out(&file);
+            QString file_text = ui->textEdit->toPlainText();
+            out << file_text;
+            file.flush();
+            file.close();
+            ui->statusbar->showMessage("Done!");
+        }
+    }
+}
+
+void Editor::on_actionSave_As_triggered()
+{
+    ui->statusbar->showMessage("");
+    QString filename = QFileDialog::getSaveFileName(this, "Open a File", QDir::currentPath());
+    fpath = filename;
+    QFile file(filename);
+    if(!file.open(QFile::WriteOnly | QFile::Text)){
+        QMessageBox::warning(this, "Warning", "Cannot Save File!");
+        return;
+    }
+    else{
+        QTextStream out(&file);
+        QString file_text = ui->textEdit->toPlainText();
+        out << file_text;
+        file.flush();
+        file.close();
+        ui->statusbar->showMessage("Done!");
+    }
+}
+//---------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+//---------------------------------------------------------------------------------------------------------------------------
+// Cut, Copy, Paste, Undo, Redo
+void Editor::on_actionCut_triggered()
+{
+    ui->statusbar->showMessage("");
+    ui->textEdit->cut();
+    ui->statusbar->showMessage("Done!");
+}
+
+
+void Editor::on_actionCopy_triggered()
+{
+    ui->statusbar->showMessage("");
+    ui->textEdit->copy();
+    ui->statusbar->showMessage("Done!");
+}
+
+void Editor::on_actionPaste_triggered()
+{
+    ui->statusbar->showMessage("");
+    ui->textEdit->paste();
+    ui->statusbar->showMessage("Done!");
+}
+
+
+void Editor::on_actionUndo_triggered()
+{
+    ui->statusbar->showMessage("");
+    ui->textEdit->undo();
+    ui->statusbar->showMessage("Done!");
+}
+
+
+void Editor::on_textEdit_undoAvailable(bool b)
+{
+    ui->actionUndo->setDisabled(!b);
+}
+
+
+void Editor::on_actionRedo_triggered()
+{
+    ui->statusbar->showMessage("");
+    ui->textEdit->redo();
+    ui->statusbar->showMessage("Done!");
+}
+
+
+void Editor::on_textEdit_redoAvailable(bool b)
+{
+    ui->actionRedo->setDisabled(!b);
+}
+//---------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+//---------------------------------------------------------------------------------------------------------------------------
+// What happens when a change in the content of the textEdit happens?
+void Editor::on_textEdit_textChanged()
+{
+    /*
+    qint32 num_of_lines = 0;
+    QString text = ui->textEdit->toPlainText();
+    for(int i=0; i<text.length(); i++){
+        if(text[i] == '\n'){
+            num_of_lines += 1;
+        }
+    }
+    ui->statusbar->showMessage(QString::number(num_of_lines+1)+" Lines.");
+    */
+    if(lines.size() > 0){
+        lines.erase(lines.begin(), lines.end());
+    }
+    ui->statusbar->showMessage("");
+}
+//---------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+//---------------------------------------------------------------------------------------------------------------------------
+// create XML vector out of XML file
 QString remove_pre_post_spaces(QString line){
     qint32 j = 0;
     while(line[j] == ' ' || line[j] == '\t' || line[j] == '\n'){
@@ -102,138 +272,13 @@ QVector<QString> create_xml_vector(QString in){
     }
     return res;
 }
+//---------------------------------------------------------------------------------------------------------------------------
 
 
-void Editor::on_actionOpen_triggered()
-{
-    ui->statusbar->showMessage("");
-    ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
-    QString filter = "All Files *.* ;; XML *.xml ;; JSON *.json";
-    QString filename = QFileDialog::getOpenFileName(this, "Open a File", QDir::currentPath(), filter);
-    fpath = filename;
-    QFile file(filename);
-    if(!file.open(QFile::ReadOnly | QFile::Text)){
-        QMessageBox::warning(this, "Warning", "Cannot Open File!");
-        return;
-    }
-    else{
-        QTextStream in(&file);
-        QString file_text = "";
-        if(!lines.empty()){
-            lines.erase(lines.begin(), lines.end());
-        }
-        file_text = in.readAll();
-        ui->textEdit->setText(file_text);
-        file.close();  
-        ui->statusbar->showMessage("Done!");
-        //lines = create_xml_vector(file_text);
-
-        /*
-        for(int i=0; i<lines.length(); i++){
-            qDebug() << lines[i];
-        }
-        */
-    }
-}
 
 
-void Editor::on_actionSave_triggered()
-{
-    ui->statusbar->showMessage("");
-    QString filename = fpath;
-    if(filename == ""){
-        on_actionSave_As_triggered();
-    }
-    else{
-        QFile file(filename);
-        if(!file.open(QFile::WriteOnly | QFile::Text)){
-            QMessageBox::warning(this, "Warning", "Cannot Save File!");
-            return;
-        }
-        else{
-            QTextStream out(&file);
-            QString file_text = ui->textEdit->toPlainText();
-            out << file_text;
-            file.flush();
-            file.close();
-            ui->statusbar->showMessage("Done!");
-        }
-    }
-}
-
-
-void Editor::on_actionSave_As_triggered()
-{
-    ui->statusbar->showMessage("");
-    QString filename = QFileDialog::getSaveFileName(this, "Open a File", QDir::currentPath());
-    fpath = filename;
-    QFile file(filename);
-    if(!file.open(QFile::WriteOnly | QFile::Text)){
-        QMessageBox::warning(this, "Warning", "Cannot Save File!");
-        return;
-    }
-    else{
-        QTextStream out(&file);
-        QString file_text = ui->textEdit->toPlainText();
-        out << file_text;
-        file.flush();
-        file.close();
-        ui->statusbar->showMessage("Done!");
-    }
-}
-
-
-void Editor::on_actionCut_triggered()
-{
-    ui->statusbar->showMessage("");
-    ui->textEdit->cut();
-    ui->statusbar->showMessage("Done!");
-}
-
-
-void Editor::on_actionCopy_triggered()
-{
-    ui->statusbar->showMessage("");
-    ui->textEdit->copy();
-    ui->statusbar->showMessage("Done!");
-}
-
-void Editor::on_actionPaste_triggered()
-{
-    ui->statusbar->showMessage("");
-    ui->textEdit->paste();
-    ui->statusbar->showMessage("Done!");
-}
-
-
-void Editor::on_actionUndo_triggered()
-{
-    ui->statusbar->showMessage("");
-    ui->textEdit->undo();
-    ui->statusbar->showMessage("Done!");
-}
-
-
-void Editor::on_textEdit_undoAvailable(bool b)
-{
-    ui->actionUndo->setDisabled(!b);
-}
-
-
-void Editor::on_actionRedo_triggered()
-{
-    ui->statusbar->showMessage("");
-    ui->textEdit->redo();
-    ui->statusbar->showMessage("Done!");
-}
-
-
-void Editor::on_textEdit_redoAvailable(bool b)
-{
-    ui->actionRedo->setDisabled(!b);
-}
-
-
+//---------------------------------------------------------------------------------------------------------------------------
+// Font Color, Dark Mode
 void Editor::on_actionFont_Color_Preferences_triggered()
 {
     QColor color = QColorDialog::getColor(Qt::black, this);
@@ -246,7 +291,6 @@ void Editor::on_actionFont_Color_Preferences_triggered()
     }
 }
 
-
 void Editor::on_actionDark_Light_mode_triggered()
 {
     if(ModeBit == 0){   // current mode: light. Switch to dark
@@ -258,27 +302,13 @@ void Editor::on_actionDark_Light_mode_triggered()
         ModeBit = 0;
     }
 }
+//---------------------------------------------------------------------------------------------------------------------------
 
 
-void Editor::on_textEdit_textChanged()
-{
-    /*
-    qint32 num_of_lines = 0;
-    QString text = ui->textEdit->toPlainText();
-    for(int i=0; i<text.length(); i++){
-        if(text[i] == '\n'){
-            num_of_lines += 1;
-        }
-    }
-    ui->statusbar->showMessage(QString::number(num_of_lines+1)+" Lines.");
-    */
-    if(lines.size() > 0){
-        lines.erase(lines.begin(), lines.end());
-    }
-    ui->statusbar->showMessage("");
-}
 
 
+//---------------------------------------------------------------------------------------------------------------------------
+// Minify XML - XML Minification
 void Editor::on_actionMinify_triggered()
 {
     //qDebug() << lines.size();
@@ -314,8 +344,13 @@ void Editor::on_actionMinify_triggered()
     ui->textEdit->setText(out);
     ui->statusbar->showMessage("Done!");
 }
+//---------------------------------------------------------------------------------------------------------------------------
 
 
+
+
+//---------------------------------------------------------------------------------------------------------------------------
+// XML Consistency Check. Returns a boolean value whether the file is XML-consistent or not
 bool check_consistency(QVector<QString> xml){
     QStack<QString> tag;
         for (int i = 0; i < xml.size(); i++) {
@@ -355,10 +390,19 @@ bool check_consistency(QVector<QString> xml){
         }
     return (tag.empty());
 }
+//---------------------------------------------------------------------------------------------------------------------------
 
-QString remove_one_indentation(QString str){
+
+
+
+//---------------------------------------------------------------------------------------------------------------------------
+// Prettify XML - XML Prettification - Beauitfy XML - XML Beautification
+// Dependant on check_consistency() boolean return
+// Current indentation: Five Spaces
+QString remove_one_indentation(QString str, QString indent){
     QString temp = "";
-    for(int i=0; i<str.length()-1;i++){
+    qint32 indLen = indent.length();
+    for(int i=0; i<str.length()-indLen;i++){
         temp += str[i];
     }
     return temp;
@@ -366,6 +410,7 @@ QString remove_one_indentation(QString str){
 
 void Editor::on_actionPrettify_XML_triggered()
 {
+    QString indent_char = "     ";
     ui->statusbar->showMessage("");
     ui->textEdit->setLineWrapMode(QTextEdit::NoWrap);
     if(lines.size() == 0){
@@ -378,7 +423,7 @@ void Editor::on_actionPrettify_XML_triggered()
            QString line = lines[i];
            if(line[0] == '<'){
                if(line[1] == '/'){
-                    indent = remove_one_indentation(indent);
+                    indent = remove_one_indentation(indent, indent_char);
                     final += indent+line;
                     final += "\n";
                }
@@ -386,7 +431,7 @@ void Editor::on_actionPrettify_XML_triggered()
                    if(!(line[line.length()-2] == '/' && line[line.length()-1] == '>')){
                        final += indent+line;
                        final += "\n";
-                       indent += "\t";
+                       indent += indent_char;
                    }
                    else{
                        final += indent+line;
@@ -411,7 +456,8 @@ void Editor::on_actionPrettify_XML_triggered()
         return;
     }
 }
-
+//---------------------------------------------------------------------------------------------------------------------------
+// NOT COMPLETED, you must show the errors and fix them
 void Editor::on_actionCheck_XML_Consistency_triggered()
 {
     ui->statusbar->showMessage("");
@@ -452,3 +498,4 @@ void Editor::on_actionCheck_XML_Consistency_triggered()
         return;
     }
 }
+//---------------------------------------------------------------------------------------------------------------------------
