@@ -190,7 +190,10 @@
      <normaloff>:/icons/icons/minify.png</normaloff>:/icons/icons/minify.png</iconset>
    </property>
    <property name="text">
-    <string>Minify</string>
+    <string>Minify XML</string>
+   </property>
+   <property name="toolTip">
+    <string>Minify XML</string>
    </property>
   </action>
  </widget>

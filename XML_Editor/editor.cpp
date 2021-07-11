@@ -10,6 +10,7 @@
 #include "QColor"
 #include "QColorDialog"
 #include "QVector"
+#include "QStack"
 
 Editor::Editor(QWidget *parent)
     : QMainWindow(parent)
@@ -167,12 +168,41 @@ void Editor::on_actionDark_Light_mode_triggered()
     }
 }
 
-
 void Editor::on_actionMinify_triggered()
 {
     QString out = "";
-    for(int i=0; i<lines.size(); i++){
-        out += lines[i];
+    if(lines.empty()){
+        QString in = ui->textEdit->toPlainText();
+        QString temp_chars = "";
+        QVector<QString> temp;
+        for(int i=0; i<in.length(); i++){
+            if(in[i] != '\n'){
+                temp_chars += in[i];
+            }
+            else if(in[i] == '\n'){
+                temp.push_back(temp_chars);
+                temp_chars = "";
+            }
+        }
+        temp.push_back(temp_chars);
+
+
+        for(int i=0; i<temp.size(); i++){
+            QString line = temp[i];
+            qint32 index = 0;
+            qint32 j = 0;
+            while(line[j] == ' '){
+                index += 1;
+                j += 1;
+            }
+            temp[i] = line.mid(j);
+            out += temp[i];
+        }
+    }
+    else{
+        for(int i=0; i<lines.size(); i++){
+            out += lines[i];
+        }
     }
     ui->textEdit->setText(out);
 }
