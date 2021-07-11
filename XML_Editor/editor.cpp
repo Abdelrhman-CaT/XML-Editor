@@ -60,8 +60,13 @@ QVector<QString> create_xml_vector(QString in){
     int i = 0;
     while(i < in.length()){
         if(in[i] == '<'){
-            while(in[i] != '>' && i < in.length()){
-                temp += in[i];
+            while(i < in.length()){
+                if(in[i] != '>'){
+                    temp += in[i];
+                }
+                else{
+                    break;
+                }
                 i++;
             }
             temp += '>';
@@ -71,8 +76,13 @@ QVector<QString> create_xml_vector(QString in){
             temp = "";
         }
         else{
-            while(in[i] != '<' && i < in.length()) {
-                temp += in[i];
+            while(i < in.length()) {
+                if(in[i] != '<'){
+                    temp += in[i];
+                }
+                else{
+                    break;
+                }
                 i++;
             }
             bool add = false;
@@ -232,6 +242,22 @@ void Editor::on_actionDark_Light_mode_triggered()
 }
 
 
+void Editor::on_textEdit_textChanged()
+{
+    qint32 num_of_lines = 0;
+    QString text = ui->textEdit->toPlainText();
+    for(int i=0; i<text.length(); i++){
+        if(text[i] == '\n'){
+            num_of_lines += 1;
+        }
+    }
+    ui->statusbar->showMessage(QString::number(num_of_lines+1)+" Lines.");
+    if(lines.size() > 0){
+        lines.erase(lines.begin(), lines.end());
+    }
+}
+
+
 void Editor::on_actionMinify_triggered()
 {
     //qDebug() << lines.size();
@@ -240,6 +266,11 @@ void Editor::on_actionMinify_triggered()
         QString in = ui->textEdit->toPlainText();
         if(in != ""){
             lines = create_xml_vector(in);
+            /*
+            for(int i=0; i<lines.length(); i++){
+               qDebug() << lines[i];
+            }
+            */
             for(int i=0; i<lines.size(); i++){
                 if(!(lines[i][0] == '<' && lines[i][1] == '!')){
                     out += lines[i];
@@ -332,5 +363,4 @@ void Editor::on_actionCheck_XML_Consistency_triggered()
         QMessageBox::warning(this, "Warning", "This XML file is NOT consistent");
     }
 }
-
 
