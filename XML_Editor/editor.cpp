@@ -181,6 +181,38 @@ void Editor::on_actionDark_Light_mode_triggered()
     }
 }
 
+QVector<QString> create_lines_typed(QString in){
+    QString temp_chars = "";
+    QVector<QString> temp;
+    for(int i=0; i<in.length(); i++){
+        if(in[i] != '\n'){
+            temp_chars += in[i];
+        }
+        else if(in[i] == '\n' && temp_chars != ""){
+            temp.push_back(temp_chars);
+            temp_chars = "";
+        }
+    }
+    temp.push_back(temp_chars);
+    for(int i=0; i<temp.size(); i++){
+        QString line = temp[i];
+        qint32 j = 0;
+        while(line[j] == ' ' || line[j] == '\t'){
+            j += 1;
+        }
+        qint32 k = line.length() - 1;
+        while(line[k] == ' ' || line[k] == '\t') {
+            k -= 1;
+        }
+        QString line_without_pre_or_post_spaces = "";
+        for(int q = j ; q <= k; q++){
+            line_without_pre_or_post_spaces += line[q];
+        }
+        temp[i] = line_without_pre_or_post_spaces;
+    }
+    return temp;
+}
+
 void Editor::on_actionMinify_triggered()
 {
     //qDebug() << lines.size();
@@ -188,34 +220,9 @@ void Editor::on_actionMinify_triggered()
     if(lines.empty()){
         QString in = ui->textEdit->toPlainText();
         if(in != ""){
-            QString temp_chars = "";
-            QVector<QString> temp;
-            for(int i=0; i<in.length(); i++){
-                if(in[i] != '\n'){
-                    temp_chars += in[i];
-                }
-                else if(in[i] == '\n' && temp_chars != ""){
-                    temp.push_back(temp_chars);
-                    temp_chars = "";
-                }
-            }
-            temp.push_back(temp_chars);
-            for(int i=0; i<temp.size(); i++){
-                QString line = temp[i];
-                qint32 j = 0;
-                while(line[j] == ' ' || line[j] == '\t'){
-                    j += 1;
-                }
-                qint32 k = line.length() - 1;
-                while(line[k] == ' ' || line[k] == '\t') {
-                    k -= 1;
-                }
-                QString line_without_pre_or_post_spaces = "";
-                for(int q = j ; q <= k; q++){
-                    line_without_pre_or_post_spaces += line[q];
-                }
-                temp[i] = line_without_pre_or_post_spaces;
-                out += temp[i];
+            QVector<QString> lines_typed = create_lines_typed(in);
+            for(int i=0; i< lines_typed.size(); i++){
+                out += lines_typed[i];
             }
         }
         else{
@@ -228,5 +235,11 @@ void Editor::on_actionMinify_triggered()
         }
     }
     ui->textEdit->setText(out);
+}
+
+
+void Editor::on_actionCheck_XML_Consistency_triggered()
+{
+
 }
 
