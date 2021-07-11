@@ -122,7 +122,7 @@ void Editor::on_actionOpen_triggered()
         file_text = in.readAll();
         ui->textEdit->setText(file_text);
         file.close();  
-        lines = create_xml_vector(file_text);
+        //lines = create_xml_vector(file_text);
 
         /*
         for(int i=0; i<lines.length(); i++){
@@ -292,14 +292,17 @@ void Editor::on_actionMinify_triggered()
 }
 
 
-bool check_consistency(QVector<QString> xml){
+bool check_consistency(QVector<QString> xml, QVector<int> *error_line_num, QVector<QString> *supposed_value_for_the_line){
     QStack<QString> tag;
+    bool consistent = true;
         for (int i = 0; i < xml.size(); i++) {
             QString line = xml[i];
             if (line[0] == '<') {
                 if (line[1] == '/') {
                     if (line != ("</" + tag.top())) {
-                        return false;
+                        consistent = false;
+                        error_line_num->push_back(i);
+                        supposed_value_for_the_line->push_back("</" + tag.top());
                     }
                     else {
                         tag.pop();
@@ -322,13 +325,15 @@ bool check_consistency(QVector<QString> xml){
                 }
             }
         }
-    return tag.empty();
+    return (tag.empty() && consistent);
 }
 
 
 
 void Editor::on_actionCheck_XML_Consistency_triggered()
 {
+    QVector<int> error_line_num;
+    QVector<QString> supposed_value_for_the_line;
     bool message;
     if(lines.empty()){
         QString in = ui->textEdit->toPlainText();
@@ -340,7 +345,7 @@ void Editor::on_actionCheck_XML_Consistency_triggered()
                 qDebug() << lines[i];
              }
             */
-            message = check_consistency(lines);
+            message = check_consistency(lines, &error_line_num, &supposed_value_for_the_line);
         }
         else{
             QMessageBox::warning(this, "Warning", "No Text To Be Checked!");
@@ -354,13 +359,16 @@ void Editor::on_actionCheck_XML_Consistency_triggered()
             qDebug() << lines[i];
          }
         */
-        message = check_consistency(lines);
+        message = check_consistency(lines, &error_line_num, &supposed_value_for_the_line);
     }
     if(message == true){
         QMessageBox::information(this, "Info", "This XML file is consistent");
     }
     else{
         QMessageBox::warning(this, "Warning", "This XML file is NOT consistent");
+        for(int i=0; i<error_line_num.length(); i++){
+            qDebug() << error_line_num[i] << " " << supposed_value_for_the_line[i];
+        }
     }
 }
 
