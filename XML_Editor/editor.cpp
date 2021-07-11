@@ -31,6 +31,8 @@ void Editor::on_actionNew_triggered()
 {
     fpath = "";
     ui->textEdit->setText("");
+    lines.erase(lines.begin(), lines.end());
+    //qDebug() << lines.size();
 }
 
 void Editor::on_actionOpen_triggered()
@@ -47,6 +49,9 @@ void Editor::on_actionOpen_triggered()
         QTextStream in(&file);
         QString file_text = "";
         qint32 num_of_lines = 0;
+        if(!lines.empty()){
+            lines.erase(lines.begin(), lines.end());
+        }
         while(!in.atEnd()){
             num_of_lines +=1;
             QString temp = in.readLine();
@@ -178,41 +183,43 @@ void Editor::on_actionDark_Light_mode_triggered()
 
 void Editor::on_actionMinify_triggered()
 {
+    //qDebug() << lines.size();
     QString out = "";
     if(lines.empty()){
         QString in = ui->textEdit->toPlainText();
-        QString temp_chars = "";
-        QVector<QString> temp;
-        for(int i=0; i<in.length(); i++){
-            if(in[i] != '\n'){
-                temp_chars += in[i];
+        if(in != ""){
+            QString temp_chars = "";
+            QVector<QString> temp;
+            for(int i=0; i<in.length(); i++){
+                if(in[i] != '\n'){
+                    temp_chars += in[i];
+                }
+                else if(in[i] == '\n' && temp_chars != ""){
+                    temp.push_back(temp_chars);
+                    temp_chars = "";
+                }
             }
-            else if(in[i] == '\n' && temp_chars != ""){
-                temp.push_back(temp_chars);
-                temp_chars = "";
+            temp.push_back(temp_chars);
+            for(int i=0; i<temp.size(); i++){
+                QString line = temp[i];
+                qint32 j = 0;
+                while(line[j] == ' ' || line[j] == '\t'){
+                    j += 1;
+                }
+                qint32 k = line.length() - 1;
+                while(line[k] == ' ' || line[k] == '\t') {
+                    k -= 1;
+                }
+                QString line_without_pre_or_post_spaces = "";
+                for(int q = j ; q <= k; q++){
+                    line_without_pre_or_post_spaces += line[q];
+                }
+                temp[i] = line_without_pre_or_post_spaces;
+                out += temp[i];
             }
         }
-        temp.push_back(temp_chars);
-
-
-        for(int i=0; i<temp.size(); i++){
-            QString line = temp[i];
-
-
-            qint32 j = 0;
-            while(line[j] == ' ' || line[j] == '\t'){
-                j += 1;
-            }
-            qint32 k = line.length() - 1;
-            while(line[k] == ' ' || line[k] == '\t') {
-                k -= 1;
-            }
-            QString line_without_pre_or_post_spaces = "";
-            for(int q = j ; q <= k; q++){
-                line_without_pre_or_post_spaces += line[q];
-            }
-            temp[i] = line_without_pre_or_post_spaces;
-            out += temp[i];
+        else{
+            QMessageBox::warning(this, "Warning", "No Text To Be Minified!");
         }
     }
     else{
