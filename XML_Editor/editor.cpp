@@ -449,7 +449,9 @@ void Editor::on_actionFix_Consistency_Errors_triggered()
     ui->textEdit->setText("");
     for(int i=0; i<temp.size(); i++){
         if(errors.find(i) != errors.end()){
-            ui->textEdit->append(errors[i]);
+            if(errors[i][0] != 'D'){
+                ui->textEdit->append(errors[i]);
+            }
         }
         else{
             ui->textEdit->append(temp[i]);

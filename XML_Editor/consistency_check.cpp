@@ -53,7 +53,7 @@ QMap<qint32, QString> identify_errors(QVector<QString> xml){
                 if (line[1] == '/') {
                     if(!tag.empty()){
                         if (line != ("</" + tag.top())) {
-                            // unmatched closing and opening tags
+                            // unmatched closing and opening tags    --->   change the closing tag to be suitable with the opening tag
                             res[i] = "</" + tag.top();
                             tag.pop();
                         }
@@ -62,8 +62,8 @@ QMap<qint32, QString> identify_errors(QVector<QString> xml){
                         }
                     }
                     else{
-                        // closing tag without opening tag
-
+                        // closing tag without opening tag    --->   remove it
+                        res[i] = "D";
                     }
                 }
                 else if(line[1] != '!' && line[1] != '?') {
