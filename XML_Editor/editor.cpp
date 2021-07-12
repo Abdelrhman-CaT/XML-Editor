@@ -382,6 +382,11 @@ void Editor::on_actionCheck_XML_Consistency_triggered()
     if(message == true){
         QMessageBox::information(this, "Info", "This XML file is consistent");
         ui->statusbar->showMessage("Done!");
+        /*
+        for(int i=0; i<lines.length(); i++){
+            qDebug() << lines[i];
+        }
+        */
     }
     else{
         QMessageBox::warning(this, "Warning", "This XML file is NOT consistent");
