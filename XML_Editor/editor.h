@@ -52,6 +52,8 @@ private slots:
 
     void on_actionShow_Consistency_Errors_triggered();
 
+    void on_actionFix_Consistency_Errors_triggered();
+
 private:
     Ui::Editor *ui;
     qint8 ModeBit = 0;   // 0 --> lightMode  1 --> darkMode

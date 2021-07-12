@@ -21,5 +21,7 @@
         <file>icons/check consistency.png</file>
         <file>icons/to json.png</file>
         <file>icons/cons.png</file>
+        <file>icons/errors.png</file>
+        <file>icons/fix.png</file>
     </qresource>
 </RCC>
