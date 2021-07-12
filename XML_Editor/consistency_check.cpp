@@ -83,5 +83,6 @@ QMap<qint32, QString> identify_errors(QVector<QString> xml){
                 }
             }
         }
+        return res;
 }
 

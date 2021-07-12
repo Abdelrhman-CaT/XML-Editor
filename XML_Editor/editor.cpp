@@ -25,6 +25,7 @@ Editor::Editor(QWidget *parent)
     ui->actionUndo->setDisabled(true);
     ui->actionRedo->setDisabled(true);
     on_actionDark_Light_mode_triggered(); // To make Dark mode the default mode
+    ui->actionShow_Consistency_Errors->setDisabled(true);
 }
 
 Editor::~Editor()
@@ -202,6 +203,7 @@ void Editor::on_textEdit_textChanged()
         lines.erase(lines.begin(), lines.end());
     }
     ui->statusbar->showMessage("");
+    ui->actionShow_Consistency_Errors->setDisabled(true);
 }
 //---------------------------------------------------------------------------------------------------------------------------
 
@@ -245,6 +247,7 @@ void Editor::on_actionMinify_triggered()
     //qDebug() << lines.size();
     ui->statusbar->showMessage("");
     ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
+    //-----------------------------------------------------------------------------
     QString out = "";
     if(lines.empty()){
         QString in = ui->textEdit->toPlainText();
@@ -273,6 +276,7 @@ void Editor::on_actionMinify_triggered()
         }
     }
     ui->textEdit->setText(out);
+    //-----------------------------------------------------------------------------
     ui->statusbar->showMessage("Done!");
 }
 //---------------------------------------------------------------------------------------------------------------------------
@@ -295,9 +299,10 @@ QString remove_one_indentation(QString str, QString indent){
 
 void Editor::on_actionPrettify_XML_triggered()
 {
-    QString indent_char = "     ";
     ui->statusbar->showMessage("");
     ui->textEdit->setLineWrapMode(QTextEdit::NoWrap);
+    //-----------------------------------------------------------------------------
+    QString indent_char = "     ";
     if(lines.size() == 0){
         lines = create_xml_vector(ui->textEdit->toPlainText());
     }
@@ -338,6 +343,7 @@ void Editor::on_actionPrettify_XML_triggered()
     }
     else{
         QMessageBox::warning(this, "Warning", "Cannot Prettify an Unconsistent XML file!");
+        ui->actionShow_Consistency_Errors->setDisabled(false);
         return;
     }
 }
@@ -352,6 +358,7 @@ void Editor::on_actionCheck_XML_Consistency_triggered()
 {
     ui->statusbar->showMessage("");
     ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
+    //-----------------------------------------------------------------------------
     bool message;
     if(lines.empty()){
         QString in = ui->textEdit->toPlainText();
@@ -390,7 +397,36 @@ void Editor::on_actionCheck_XML_Consistency_triggered()
     }
     else{
         QMessageBox::warning(this, "Warning", "This XML file is NOT consistent");
+        ui->actionShow_Consistency_Errors->setDisabled(false);
         return;
     }
 }
 //---------------------------------------------------------------------------------------------------------------------------
+
+void Editor::on_actionShow_Consistency_Errors_triggered()
+{
+    ui->statusbar->showMessage("");
+    ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
+    //-----------------------------------------------------------------------------
+    if(lines.size() == 0){
+        lines = create_xml_vector(ui->textEdit->toPlainText());
+    }
+    QVector<QString> temp = lines;
+    QMap<qint32, QString> errors = identify_errors(temp);
+    ui->textEdit->setText("");
+    for(int i=0; i<temp.size(); i++){
+        if(errors.find(i) != errors.end()){
+            ui->textEdit->setTextBackgroundColor(Qt::red);
+            ui->textEdit->append(temp[i]);
+            ui->textEdit->setTextBackgroundColor(Qt::transparent);
+        }
+        else{
+            ui->textEdit->append(temp[i]);
+        }
+    }
+    lines = temp;
+    ui->actionShow_Consistency_Errors->setDisabled(false);
+    //-----------------------------------------------------------------------------
+    ui->statusbar->showMessage("Done!");
+}
+
