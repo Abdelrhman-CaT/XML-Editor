@@ -432,7 +432,7 @@ void Editor::on_actionShow_Consistency_Errors_triggered()
     ui->actionShow_Consistency_Errors->setDisabled(false);
     ui->actionFix_Consistency_Errors->setDisabled(false);
     //-----------------------------------------------------------------------------
-    ui->statusbar->showMessage("Done!");
+    ui->statusbar->showMessage("Done!     Number of Errors: " + QString::number(errors.size()));
 }
 
 
