@@ -203,7 +203,6 @@ void Editor::on_textEdit_textChanged()
     if(lines.size() > 0){
         lines.erase(lines.begin(), lines.end());
     }
-    ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
     ui->statusbar->showMessage("");
     ui->actionShow_Consistency_Errors->setDisabled(true);
     ui->actionFix_Consistency_Errors->setDisabled(true);
