@@ -409,12 +409,71 @@ void Editor::on_actionCheck_XML_Consistency_triggered()
 
 void Editor::on_actionShow_Consistency_Errors_triggered()
 {
-
+    ui->statusbar->showMessage("");
+    ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
+    //-----------------------------------------------------------------------------
+    if(lines.size() == 0){
+        lines = create_xml_vector(ui->textEdit->toPlainText());
+    }
+    QVector<QString> temp = lines;
+    QMap<qint32, QString> errors = identify_errors(temp);
+    ui->textEdit->setText("");
+    int i = 0;
+    for(i=0; i<temp.size(); i++){
+        if(errors.find(i) != errors.end()){
+            ui->textEdit->setTextBackgroundColor(Qt::red);
+            ui->textEdit->append(temp[i]);
+            ui->textEdit->setTextBackgroundColor(Qt::transparent);
+        }
+        else{
+            ui->textEdit->append(temp[i]);
+        }
+    }
+    lines = temp;
+    ui->actionShow_Consistency_Errors->setDisabled(false);
+    ui->actionFix_Consistency_Errors->setDisabled(false);
+    //-----------------------------------------------------------------------------
+    ui->statusbar->showMessage("Done!     Number of Errors: " + QString::number(errors.size()));
 }
 
 
 void Editor::on_actionFix_Consistency_Errors_triggered()
 {
-
+    ui->statusbar->showMessage("");
+    ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
+    //-----------------------------------------------------------------------------
+    if(lines.size() == 0){
+        lines = create_xml_vector(ui->textEdit->toPlainText());
+    }
+    QVector<QString> temp = lines;
+    QMap<qint32, QString> errors = identify_errors(temp);
+    ui->textEdit->setText("");
+    int i = 0;
+    for(i=0; i<temp.size(); i++){
+        if(errors.find(i) != errors.end()){
+            if(errors[i][0] == 'A'){
+                ui->textEdit->append(temp[i]);
+            }
+            else if(errors[i][0] != 'D'){
+                ui->textEdit->append(errors[i]);
+            }
+        }
+        else{
+            ui->textEdit->append(temp[i]);
+        }
+    }
+    for(auto j = errors.begin(); j != errors.end(); j++){
+        QString value = j.value();
+        if(value[0] == 'A'){
+            QString viewValue = "";
+            for(int k = 1; k< value.length(); k++){
+                viewValue += value[k];
+            }
+            viewValue = "</" + viewValue;
+            ui->textEdit->append(viewValue);
+        }
+    }
+    //-----------------------------------------------------------------------------
+    ui->statusbar->showMessage("Done!");
 }
 
