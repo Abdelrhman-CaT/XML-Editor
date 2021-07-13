@@ -23,5 +23,6 @@
         <file>icons/cons.png</file>
         <file>icons/errors.png</file>
         <file>icons/fix.png</file>
+        <file>icons/icon.png</file>
     </qresource>
 </RCC>

@@ -76,9 +76,16 @@ p, li { white-space: pre-wrap; }
     <addaction name="actionShow_Consistency_Errors"/>
     <addaction name="actionFix_Consistency_Errors"/>
    </widget>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>About</string>
+    </property>
+    <addaction name="actionTeam"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuTools"/>
+   <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -114,6 +121,7 @@ p, li { white-space: pre-wrap; }
    <addaction name="separator"/>
    <addaction name="actionConvert_to_JSON"/>
    <addaction name="actionCompress_Data"/>
+   <addaction name="actionTeam"/>
   </widget>
   <action name="actionNew">
    <property name="icon">
@@ -278,6 +286,15 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="text">
     <string>Fix Consistency Errors</string>
+   </property>
+  </action>
+  <action name="actionTeam">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/icons/icons/icon.png</normaloff>:/icons/icons/icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Team</string>
    </property>
   </action>
  </widget>

@@ -38,6 +38,17 @@ Editor::~Editor()
 
 
 
+//---------------------------------------------------------------------------------------------------------------------------
+void Editor::on_actionTeam_triggered()
+{
+    QString info;
+    info = "This is a university project created by:\n-------------------------------------------\n1- Abdelrahman Hany Gamal Bakr\n2- Zeyad Mourad Abd-El Mahfouz Mohamed\n3- Menna Abd-El Hafeez Mohamed Abdelrahman\n4- Munira Nasser Fouad Hassanin";
+    QMessageBox::information(this, "Info", info);
+}
+//---------------------------------------------------------------------------------------------------------------------------
+
+
+
 
 //---------------------------------------------------------------------------------------------------------------------------
 // New, Open, Save, Save As
@@ -500,3 +511,4 @@ void Editor::on_actionFix_Consistency_Errors_triggered()
     ui->statusbar->showMessage("Done!");
 }
 //---------------------------------------------------------------------------------------------------------------------------
+
