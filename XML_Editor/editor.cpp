@@ -71,7 +71,7 @@ void Editor::on_actionOpen_triggered()
         file_text = in.readAll();
         ui->textEdit->setText(file_text);
         file.close();
-        ui->statusbar->showMessage("Done!");
+        ui->statusbar->showMessage("Done!         File size: " + QString::number(file.size()) + " KB");
         //lines = create_xml_vector(file_text);
 
         /*
@@ -308,6 +308,10 @@ void Editor::on_actionPrettify_XML_triggered()
     if(lines.size() == 0){
         lines = create_xml_vector(ui->textEdit->toPlainText());
     }
+    if(lines.size() == 0){
+        QMessageBox::warning(this, "Warning", "No text to be prettified!");
+        return;
+    }
     if(check_consistency(lines)){
         QString indent = "";
         QString final = "";
@@ -356,7 +360,7 @@ void Editor::on_actionPrettify_XML_triggered()
 
 
 //---------------------------------------------------------------------------------------------------------------------------
-// NOT COMPLETED, you must show the errors and fix them
+// Checks the file consistency in terms of XML standards
 void Editor::on_actionCheck_XML_Consistency_triggered()
 {
     ui->statusbar->showMessage("");
@@ -407,6 +411,11 @@ void Editor::on_actionCheck_XML_Consistency_triggered()
 }
 //---------------------------------------------------------------------------------------------------------------------------
 
+
+
+
+//---------------------------------------------------------------------------------------------------------------------------
+// Show and fix consistency errors
 void Editor::on_actionShow_Consistency_Errors_triggered()
 {
     ui->statusbar->showMessage("");
@@ -435,7 +444,6 @@ void Editor::on_actionShow_Consistency_Errors_triggered()
     //-----------------------------------------------------------------------------
     ui->statusbar->showMessage("Done!     Number of Errors: " + QString::number(errors.size()));
 }
-
 
 void Editor::on_actionFix_Consistency_Errors_triggered()
 {
@@ -491,4 +499,4 @@ void Editor::on_actionFix_Consistency_Errors_triggered()
     //-----------------------------------------------------------------------------
     ui->statusbar->showMessage("Done!");
 }
-
+//---------------------------------------------------------------------------------------------------------------------------
