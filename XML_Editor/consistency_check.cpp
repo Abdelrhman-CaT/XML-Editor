@@ -87,8 +87,24 @@ QMap<qint32, QString> identify_errors(QVector<QString> xml){
                     }
                 }
             }
+            else{
+                // this line is a normal string
+                // opening tag without closing tag and the tag value is just a string   --->   add the missing closing tag
+                if(i+1 < xml.length()){
+                    QString should_be_closing = xml[i+1];
+                    if(!(should_be_closing[0] == '<' && should_be_closing[1] == '/')){
+                        if(!tag.empty()){
+                            QString correct = "</" + tag.top();
+                            tag.pop();
+                            line_num.pop();
+                            res[i] = "U" + correct;
+                        }
+                    }
+                }
+            }
         }
         if(!tag.empty()){
+            // opening tag without closing tag    --->   add the missing closing tag
             int size = tag.size();
             for(int j = 0; j<size; j++){
                 QString extra = tag.top();

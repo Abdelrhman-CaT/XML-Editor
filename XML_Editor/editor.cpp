@@ -454,6 +454,15 @@ void Editor::on_actionFix_Consistency_Errors_triggered()
             if(errors[i][0] == 'A'){
                 ui->textEdit->append(temp[i]);
             }
+            else if(errors[i][0] == 'U'){
+                QString value = errors[i];
+                QString viewValue = "";
+                for(int k = 1; k < value.length(); k++){
+                    viewValue += value[k];
+                }
+                ui->textEdit->append(temp[i]);
+                ui->textEdit->append(viewValue);
+            }
             else if(errors[i][0] != 'D'){
                 ui->textEdit->append(errors[i]);
             }
@@ -462,16 +471,22 @@ void Editor::on_actionFix_Consistency_Errors_triggered()
             ui->textEdit->append(temp[i]);
         }
     }
+
+    QVector<int> line_num;
     for(auto j = errors.begin(); j != errors.end(); j++){
         QString value = j.value();
         if(value[0] == 'A'){
-            QString viewValue = "";
-            for(int k = 1; k< value.length(); k++){
-                viewValue += value[k];
-            }
-            viewValue = "</" + viewValue;
-            ui->textEdit->append(viewValue);
+            line_num.push_back(j.key());
         }
+    }
+    for(int q = line_num.length()-1; q >= 0; q--){
+        QString value = errors[line_num[q]];
+        QString viewValue = "";
+        for(int k = 1; k < value.length(); k++){
+            viewValue += value[k];
+        }
+        viewValue = "</" + viewValue;
+        ui->textEdit->append(viewValue);
     }
     //-----------------------------------------------------------------------------
     ui->statusbar->showMessage("Done!");
