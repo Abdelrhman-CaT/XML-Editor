@@ -2,6 +2,7 @@
 #include "ui_editor.h"
 #include "xml_vector.h"
 #include "consistency_check.h"
+#include "compression.h"
 #include "QFile"
 #include "QFileDialog"
 #include "QDir"
@@ -82,7 +83,7 @@ void Editor::on_actionOpen_triggered()
         file_text = in.readAll();
         ui->textEdit->setText(file_text);
         file.close();
-        ui->statusbar->showMessage("Done!         File size: " + QString::number(file.size()) + " KB");
+        ui->statusbar->showMessage("Done!         File size: " + QString::number(file.size()/1024.0) + " KB");
         //lines = create_xml_vector(file_text);
 
         /*
@@ -120,7 +121,7 @@ void Editor::on_actionSave_triggered()
 void Editor::on_actionSave_As_triggered()
 {
     ui->statusbar->showMessage("");
-    QString filename = QFileDialog::getSaveFileName(this, "Open a File", QDir::currentPath());
+    QString filename = QFileDialog::getSaveFileName(this, "Choose the Location to Save the File", QDir::currentPath());
     fpath = filename;
     QFile file(filename);
     if(!file.open(QFile::WriteOnly | QFile::Text)){
@@ -512,3 +513,13 @@ void Editor::on_actionFix_Consistency_Errors_triggered()
 }
 //---------------------------------------------------------------------------------------------------------------------------
 
+
+
+
+//---------------------------------------------------------------------------------------------------------------------------
+// Compress File
+void Editor::on_actionCompress_Data_triggered()
+{
+
+}
+//---------------------------------------------------------------------------------------------------------------------------

@@ -9,12 +9,14 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    compression.cpp \
     consistency_check.cpp \
     main.cpp \
     editor.cpp \
     xml_vector.cpp
 
 HEADERS += \
+    compression.h \
     consistency_check.h \
     editor.h \
     xml_vector.h

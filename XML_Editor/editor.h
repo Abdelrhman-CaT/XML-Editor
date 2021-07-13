@@ -56,6 +56,8 @@ private slots:
 
     void on_actionTeam_triggered();
 
+    void on_actionCompress_Data_triggered();
+
 private:
     Ui::Editor *ui;
     qint8 ModeBit = 0;   // 0 --> lightMode  1 --> darkMode

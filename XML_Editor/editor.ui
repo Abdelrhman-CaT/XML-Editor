@@ -100,6 +100,7 @@ p, li { white-space: pre-wrap; }
    </attribute>
    <addaction name="actionNew"/>
    <addaction name="actionOpen"/>
+   <addaction name="actionCompress_Data"/>
    <addaction name="actionSave"/>
    <addaction name="separator"/>
    <addaction name="actionCut"/>
@@ -118,9 +119,8 @@ p, li { white-space: pre-wrap; }
    <addaction name="separator"/>
    <addaction name="actionMinify"/>
    <addaction name="actionPrettify_XML"/>
-   <addaction name="separator"/>
    <addaction name="actionConvert_to_JSON"/>
-   <addaction name="actionCompress_Data"/>
+   <addaction name="separator"/>
    <addaction name="actionTeam"/>
   </widget>
   <action name="actionNew">
@@ -267,7 +267,7 @@ p, li { white-space: pre-wrap; }
      <normaloff>:/icons/icons/compress.png</normaloff>:/icons/icons/compress.png</iconset>
    </property>
    <property name="text">
-    <string>Compress Data</string>
+    <string>Compress File</string>
    </property>
   </action>
   <action name="actionShow_Consistency_Errors">
