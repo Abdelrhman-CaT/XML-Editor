@@ -228,13 +228,25 @@ void Editor::on_textEdit_textChanged()
 // Font Color, Dark Mode
 void Editor::on_actionFont_Color_Preferences_triggered()
 {
-    QColor color = QColorDialog::getColor(Qt::black, this);
-    QString color_name = color.name();
+    QColor default_color;
     if(ModeBit == 0){
-        ui->textEdit->setStyleSheet("background-color: 'white'; font: 11pt 'Consolas'; color: '" + color_name +"';");
+        // light
+        default_color = Qt::black;
     }
     else{
-        ui->textEdit->setStyleSheet("background-color: #404040; font: 11pt 'Consolas'; color: '" + color_name +"';");
+        // dark
+        QColor def(85,255,255,1);
+        default_color = def;
+    }
+    QColor color = QColorDialog::getColor(default_color, this);
+    if(color.isValid()){
+        QString color_name = color.name();
+        if(ModeBit == 0){
+            ui->textEdit->setStyleSheet("background-color: 'white'; font: 11pt 'Consolas'; color: '" + color_name +"';");
+        }
+        else{
+            ui->textEdit->setStyleSheet("background-color: #404040; font: 11pt 'Consolas'; color: '" + color_name +"';");
+        }
     }
 }
 
