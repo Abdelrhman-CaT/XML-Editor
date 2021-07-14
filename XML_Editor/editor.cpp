@@ -274,46 +274,55 @@ void Editor::on_actionMinify_triggered()
     ui->statusbar->showMessage("");
     ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
     //-----------------------------------------------------------------------------
-    QString filename = QFileDialog::getSaveFileName(this, "Choose the Location to Save the Minified File", QDir::currentPath());
-    fpath = filename;
-    QFile file(filename);
-    if(!file.open(QFile::WriteOnly | QFile::Text)){
-        QMessageBox::warning(this, "Warning", "Cannot Save File!");
-        return;
-    }
     QString out = "";
     if(lines.empty()){
         QString in = ui->textEdit->toPlainText();
         if(in != ""){
-            lines = create_xml_vector(in);
-            /*
-            for(int i=0; i<lines.length(); i++){
-               qDebug() << lines[i];
+            QString filename = QFileDialog::getSaveFileName(this, "Choose the Location to Save the Minified File", QDir::currentPath());
+            fpath = filename;
+            QFile file(filename);
+            if(!file.open(QFile::WriteOnly | QFile::Text)){
+                QMessageBox::warning(this, "Warning", "Cannot Save File!");
+                return;
             }
-            */
+            lines = create_xml_vector(in);
             for(int i=0; i<lines.size(); i++){
                 if(!(lines[i][0] == '<' && lines[i][1] == '!')){
                     out += lines[i];
                 }
             }
+            QTextStream outt(&file);
+            outt << out;
+            file.flush();
+            file.close();
+            QMessageBox::information(this, "Info", "File Minified Successfully!\nThe Minified File Can Be Found at: " + filename);
         }
         else{
             QMessageBox::warning(this, "Warning", "No Text To Be Minified!");
+            return;
         }
     }
     else{
+        QString filename = QFileDialog::getSaveFileName(this, "Choose the Location to Save the Minified File", QDir::currentPath());
+        fpath = filename;
+        QFile file(filename);
+        if(!file.open(QFile::WriteOnly | QFile::Text)){
+            QMessageBox::warning(this, "Warning", "Cannot Save File!");
+            return;
+        }
         for(int i=0; i<lines.size(); i++){
             if(!(lines[i][0] == '<' && lines[i][1] == '!')){
                 out += lines[i];
             }
         }
+        QTextStream outt(&file);
+        outt << out;
+        file.flush();
+        file.close();
+        QMessageBox::information(this, "Info", "File Minified Successfully!\nThe Minified File Can Be Found at: " + filename);
     }
     //ui->textEdit->setText(out);
-    QTextStream outt(&file);
-    outt << out;
-    file.flush();
-    file.close();
-    QMessageBox::information(this, "Info", "File Minified Successfully!\nThe Minified File Can Be Found at: " + filename);
+
     //-----------------------------------------------------------------------------
     ui->statusbar->showMessage("Done!");
 }
