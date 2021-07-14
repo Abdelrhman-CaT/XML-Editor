@@ -274,6 +274,13 @@ void Editor::on_actionMinify_triggered()
     ui->statusbar->showMessage("");
     ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
     //-----------------------------------------------------------------------------
+    QString filename = QFileDialog::getSaveFileName(this, "Choose the Location to Save the Minified File", QDir::currentPath());
+    fpath = filename;
+    QFile file(filename);
+    if(!file.open(QFile::WriteOnly | QFile::Text)){
+        QMessageBox::warning(this, "Warning", "Cannot Save File!");
+        return;
+    }
     QString out = "";
     if(lines.empty()){
         QString in = ui->textEdit->toPlainText();
@@ -301,7 +308,12 @@ void Editor::on_actionMinify_triggered()
             }
         }
     }
-    ui->textEdit->setText(out);
+    //ui->textEdit->setText(out);
+    QTextStream outt(&file);
+    outt << out;
+    file.flush();
+    file.close();
+    QMessageBox::information(this, "Info", "File Minified Successfully!\nThe Minified File Can Be Found at: " + filename);
     //-----------------------------------------------------------------------------
     ui->statusbar->showMessage("Done!");
 }
@@ -326,7 +338,7 @@ QString remove_one_indentation(QString str, QString indent){
 void Editor::on_actionPrettify_XML_triggered()
 {
     ui->statusbar->showMessage("");
-    ui->textEdit->setLineWrapMode(QTextEdit::NoWrap);
+    ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
     //-----------------------------------------------------------------------------
     QString indent_char = "     ";
     if(lines.size() == 0){
@@ -334,6 +346,13 @@ void Editor::on_actionPrettify_XML_triggered()
     }
     if(lines.size() == 0){
         QMessageBox::warning(this, "Warning", "No text to be prettified!");
+        return;
+    }
+    QString filename = QFileDialog::getSaveFileName(this, "Choose the Location to Save the Prettified File", QDir::currentPath());
+    fpath = filename;
+    QFile file(filename);
+    if(!file.open(QFile::WriteOnly | QFile::Text)){
+        QMessageBox::warning(this, "Warning", "Cannot Save File!");
         return;
     }
     if(check_consistency(lines)){
@@ -368,7 +387,12 @@ void Editor::on_actionPrettify_XML_triggered()
                final += "\n";
            }
         }
-        ui->textEdit->setText(final);
+        //ui->textEdit->setText(final);
+        QTextStream out(&file);
+        out << final;
+        file.flush();
+        file.close();
+        QMessageBox::information(this, "Info", "File Prettified Successfully!\nThe Prettified File Can Be Found at: " + filename);
         ui->statusbar->showMessage("Done!");
     }
     else{
