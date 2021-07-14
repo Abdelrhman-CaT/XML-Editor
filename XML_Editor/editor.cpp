@@ -372,7 +372,7 @@ void Editor::on_actionPrettify_XML_triggered()
         ui->statusbar->showMessage("Done!");
     }
     else{
-        QMessageBox::warning(this, "Warning", "Cannot Prettify an Unconsistent XML file!");
+        QMessageBox::warning(this, "Warning", "Cannot Prettify an Inconsistent XML file!");
         ui->actionShow_Consistency_Errors->setDisabled(false);
         ui->actionFix_Consistency_Errors->setDisabled(false);
         return;
