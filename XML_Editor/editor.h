@@ -58,6 +58,8 @@ private slots:
 
     void on_actionCompress_Data_triggered();
 
+    void on_actionConvert_to_JSON_triggered();
+
 private:
     Ui::Editor *ui;
     qint8 ModeBit = 0;   // 0 --> lightMode  1 --> darkMode

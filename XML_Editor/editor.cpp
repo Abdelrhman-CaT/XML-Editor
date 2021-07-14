@@ -535,3 +535,27 @@ void Editor::on_actionCompress_Data_triggered()
 
 }
 //---------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+//---------------------------------------------------------------------------------------------------------------------------
+// convert XML to JSON
+void Editor::on_actionConvert_to_JSON_triggered()
+{
+    ui->statusbar->showMessage("");
+    ui->textEdit->setLineWrapMode(QTextEdit::NoWrap);
+    //-----------------------------------------------------------------------------
+    QString in = ui->textEdit->toPlainText();
+    if(in == ""){
+        QMessageBox::warning(this, "Warning", "No Text To Be Converted");
+        return;
+    }
+    string inQ = in.toLocal8Bit().constData();
+    vector<string> linesQ = create_xml_vectorQ(inQ);
+    // pass linesQ to the convert function
+
+    //-----------------------------------------------------------------------------
+    ui->statusbar->showMessage("Done!");
+}
+
