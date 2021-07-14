@@ -1,7 +1,7 @@
 # XML-Editor
 
 <p align="center">
-    <img src="XML-Editor/XML_Editor/icons/xml.png">
+    <img src="XML_Editor/icons/xml.png">
 </p>
 
 This is a University project, where we can apply data structure concepts to a real-life project. At the end of this project, our team would be able to effectively implement different data structures from scratch and build an XML editor that supports different features.
