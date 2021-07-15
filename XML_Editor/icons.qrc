@@ -24,5 +24,6 @@
         <file>icons/errors.png</file>
         <file>icons/fix.png</file>
         <file>icons/icon.png</file>
+        <file>icons/decompress.png</file>
     </qresource>
 </RCC>

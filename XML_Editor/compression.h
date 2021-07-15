@@ -57,7 +57,27 @@ private:
     treenode*root;
 public:
     void encoding(treenode* n,string c, map<char,string>&newcode);
-    queue<unsigned char> maketree(string c);
+    queue<unsigned char> maketree(string c, map<char,string> &codes,int &sizee);
+};
+
+class decnode{
+public:
+    char value;
+    char ch;
+    decnode*left;
+    decnode*right;
+    decnode(char val,char c);
+    decnode* addnode(decnode* n,char val);
+};
+
+class dectree{
+private:
+    decnode*decroot;
+public:
+    dectree();
+    decnode* add(char value,decnode*n);
+    void makedectree(string filename,string compfile,string recover);
+    string makedectree2(string key,string s);
 };
 
 #endif // COMPRESSION_H

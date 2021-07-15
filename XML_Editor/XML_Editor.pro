@@ -11,6 +11,7 @@ CONFIG += c++11
 SOURCES += \
     compression.cpp \
     consistency_check.cpp \
+    json.cpp \
     main.cpp \
     editor.cpp \
     xml_vector.cpp
@@ -19,6 +20,7 @@ HEADERS += \
     compression.h \
     consistency_check.h \
     editor.h \
+    json.h \
     xml_vector.h
 
 FORMS += \

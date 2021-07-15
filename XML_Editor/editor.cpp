@@ -3,7 +3,7 @@
 #include "xml_vector.h"
 #include "consistency_check.h"
 #include "compression.h"
-//#include "json.h"
+#include "json.h"
 #include "QFile"
 #include "QFileDialog"
 #include "QDir"
@@ -30,6 +30,7 @@ Editor::Editor(QWidget *parent)
     on_actionDark_Light_mode_triggered(); // To make Dark mode the default mode
     ui->actionShow_Consistency_Errors->setDisabled(true);
     ui->actionFix_Consistency_Errors->setDisabled(true);
+    ui->actionDecompress_File->setVisible(false);
 }
 
 Editor::~Editor()
@@ -651,7 +652,10 @@ void Editor::on_actionFix_Consistency_Errors_triggered()
 
 
 //---------------------------------------------------------------------------------------------------------------------------
+int sizee = 0;
+map<char, string> new_code;
 // Compress File
+
 void Editor::on_actionCompress_Data_triggered()
 {
     ui->statusbar->showMessage("");
@@ -682,10 +686,21 @@ void Editor::on_actionCompress_Data_triggered()
         QMessageBox::warning(this, "Warning", "Cannot Save File!");
         return;
     }
+    // Choosing the location to save the compression key
+    /*
+    QString codeName = QFileDialog::getSaveFileName(this, "Choose the Location to Save the Compression Key File", QDir::currentPath());
+    QFile key(codeName);
+    if(!key.open(QFile::WriteOnly | QFile::Text)){
+        QMessageBox::warning(this, "Warning", "Cannot Save File!");
+        return;
+    }
+
+    QTextStream cooode(&key);
+    */
     QTextStream out(&neew);
     // Processing
     tree t1;
-    kj = t1.maketree(c); //to write to a file
+    kj = t1.maketree(c, new_code, sizee); //to write to a file
     unsigned char zx;
     QString final = "";
     for (unsigned int i = 0; kj.size() != 0; i++) {
@@ -700,6 +715,17 @@ void Editor::on_actionCompress_Data_triggered()
     neew.flush();
     neew.close();
     new_size = neew.size()/1024.0;
+    // writing the compression key code file
+    /*
+    cooode << sizee << endl;
+    for(auto i = new_code.begin(); i!=new_code.end(); i++){
+        string temp = i->second + '&' + i->first;
+        QString tempQ = QString::fromStdString(temp);
+        cooode << tempQ;
+    }
+    key.flush();
+    key.close();
+    */
     // Finalization
     ui->statusbar->showMessage("Done!");
     QMessageBox::information(this, "Info", "File Compressed Successfully!\nThe Compressed File Can Be Found At: " + fname + "\nOld File Size is " + QString::number(old_size) + " KB\nNew File Size is " + QString::number(new_size) + " KB");
@@ -728,6 +754,84 @@ void Editor::on_actionCompress_Data_triggered()
     }
     //-----------------------------------------------------------------------------------------------------------------------
 }
+
+void Editor::on_actionDecompress_File_triggered()
+{
+    ui->statusbar->showMessage("");
+    ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
+    double old_size = 0;
+    double new_size = 0;
+    //----------------------------------------------------------------------------
+    // reading compressed file
+    QString compressedFileName = QFileDialog::getOpenFileName(this, "Choose the Compressed File", QDir::currentPath());
+    QFile compressedFile(compressedFileName);
+    if(!compressedFile.open(QFile::ReadOnly | QFile::Text)){
+        QMessageBox::warning(this, "Warning", "Cannot Open The Compressed File!");
+        return;
+    }
+    QTextStream inOld(&compressedFile);
+    QString cQ = inOld.readAll();
+    string compress = cQ.toLocal8Bit().constData();      // contains the compressed file
+    compressedFile.close();
+    old_size = compressedFile.size();
+    //string cf = compressedFileName.toLocal8Bit().constData();
+    // reading compression key file
+    QString compressionKeyFileName = QFileDialog::getOpenFileName(this, "Choose the Compression Key File", QDir::currentPath());
+    QFile compressionKeyFile(compressionKeyFileName);
+    if(!compressionKeyFile.open(QFile::ReadOnly | QFile::Text)){
+        QMessageBox::warning(this, "Warning", "Cannot Open The Compression Key File!");
+        return;
+    }
+    QTextStream inKey(&compressionKeyFile);
+    QString cQQ = compressionKeyFile.readAll();
+    string compressKey = cQ.toLocal8Bit().constData();      // contains the compression key
+    compressedFile.close();
+    //string ck = compressionKeyFileName.toLocal8Bit().constData();
+    QString decompressedFileName = QFileDialog::getSaveFileName(this, "Choose the Location to Save the Decompressed File", QDir::currentPath());
+    QFile decomp(decompressedFileName);
+    if(!decomp.open(QFile::WriteOnly | QFile::Text)){
+        QMessageBox::warning(this, "Warning", "Cannot Save File!");
+        return;
+    }
+    //string dist = decompressedFileName.toLocal8Bit().constData();
+    //----------------------------------------------------------------------------------------------
+    // processing
+    dectree t2;
+    string resQ;
+    resQ = t2.makedectree2(compressKey,compress);
+    QString res = QString::fromStdString(resQ);
+    //----------------------------------------------------------------------------------------------
+    // writing the decoded file
+    QTextStream out(&decomp);
+    out << res;
+    decomp.flush();
+    decomp.close();
+    // reading the output file
+    QMessageBox::information(this, "Info", "File Decompressed Successfully!\nThe Decompressed File Can Be Found At: " + decompressedFileName + "\nOld File Size is " + QString::number(old_size) + " KB\nNew File Size is " + QString::number(new_size) + " KB");
+    QFile file(decompressedFileName);
+    if(!file.open(QFile::ReadOnly | QFile::Text)){
+        QMessageBox::warning(this, "Warning", "Cannot Open the Results File!");
+        return;
+    }
+    else{
+        QTextStream in(&file);
+        QString file_text = "";
+        if(new_size > 3*1024){ // file larger than 3 MB
+            ui->textEdit->setText("");
+            QMessageBox::warning(this, "Warning", "Due to large file size > 3 MB, we will view the first 100 lines of the output file only");
+            for(int q=0; q<100; q++){
+                file_text = in.readLine();
+                ui->textEdit->append(file_text);
+            }
+        }
+        else{
+            file_text = in.readAll();
+            ui->textEdit->setText(file_text);
+        }
+        file.close();
+        ui->statusbar->showMessage("Done!");
+    }
+}
 //---------------------------------------------------------------------------------------------------------------------------
 
 
@@ -735,8 +839,90 @@ void Editor::on_actionCompress_Data_triggered()
 
 //---------------------------------------------------------------------------------------------------------------------------
 // convert XML to JSON
-void Editor::on_actionConvert_to_JSON_triggered()
-{
+void Editor::on_actionConvert_to_JSON_triggered(){
+    ui->statusbar->showMessage("");
+        //-----------------------------------------------------------------------------
+        QString in = ui->textEdit->toPlainText();
+        if(in == ""){
+            QMessageBox::warning(this, "Warning", "No Text To Be Converted");
+            return;
+        }
+        /*
+        // File input
+        QString filename = QFileDialog::getSaveFileName(this, "Choose the Location to Save the JSON File", QDir::currentPath());
+        fpath = filename;
+        QFile file(filename);
+        if(!file.open(QFile::WriteOnly | QFile::Text)){
+            QMessageBox::warning(this, "Warning", "Cannot Save File!");
+            return;
+        }
+        */
 
+
+        // Processing
+
+        lines = create_xml_vector(in);
+        if(!check_consistency(lines)){
+            QMessageBox::warning(this, "Warning", "Cannot Convert An Inconsistent XML File");
+            return;
+        }
+        string inq = in.toLocal8Bit().constData();
+        vector<string> linesQ = create_xml_vectorQ(inq);
+        int linesQSize = linesQ.size();
+        node *root;
+        root = create_tree(linesQ, linesQSize);
+        string out = "";
+        out  = iteration(root, out);
+        QString res = QString::fromStdString(out);
+
+
+
+        /*
+        for(int i=0; i<linesQ.size(); i++){
+            cout << linesQ[i] << '\n';
+        }
+        */
+        // Output
+        //--------------
+        // on screen
+        ui->textEdit->setText(res);
+
+        // to file
+        QString fname = QFileDialog::getSaveFileName(this, "Choose the Location to Save the JSON File", QDir::currentPath());
+        QFile fileQ(fname);
+        if(!fileQ.open(QFile::WriteOnly | QFile::Text)){
+            QMessageBox::warning(this, "Warning", "Cannot Save File!");
+            return;
+        }
+        QTextStream outt(&fileQ);
+        outt << res;
+        fileQ.flush();
+        fileQ.close();
+        QMessageBox::information(this, "Info", "File Coverted Successfully!\nThe JSON File Can Be Found at: " + fname);
+        // read the file after the output
+    ui->textEdit->setLineWrapMode(QTextEdit::NoWrap);
+        QFile inn(fname);
+        if(!fileQ.open(QFile::ReadOnly | QFile::Text)){
+            QMessageBox::warning(this, "Warning", "Cannot Open the Results File!");
+            return;
+        }
+        QTextStream inp(&inn);
+        QString text_in_area;
+        if(inn.size() > 3*1024*1024){
+            ui->textEdit->setText("");
+            QMessageBox::warning(this, "Warning", "Due to large file size > 3 MB, we will view the first 100 lines of the output file only");
+            for(int q=0; q<100; q++){
+                text_in_area = inp.readLine();
+                ui->textEdit->append(text_in_area);
+            }
+        }
+        else{
+            text_in_area = inp.readAll();
+            ui->textEdit->setText(text_in_area);
+        }
+        inn.close();
+        //-----------------------------------------------------------------------------
+        ui->statusbar->showMessage("Done!");
 }
+
 

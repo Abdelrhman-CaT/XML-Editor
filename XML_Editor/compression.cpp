@@ -88,7 +88,7 @@ void tree::encoding(treenode* n,string c, map<char,string>&newcode){
        encoding(n->right,c+"1",newcode);
 }
 
-queue<unsigned char> tree::maketree(string c){
+queue<unsigned char> tree::maketree(string c, map<char,string> &codes,int &sizee){
     queue<unsigned char> kj;
     if (c=="") return kj;
     //to find the frequency of every char
@@ -132,6 +132,8 @@ queue<unsigned char> tree::maketree(string c){
     unsigned char bb=0;
     string ss;
     string sss;
+    sizee = s.length()%8;
+    sizee = 8-sizee;
     for(unsigned int i=0;i<s.length();i+=8){
         //ss=s.substr(i,8);
         ss=substring(s,i,8,s.length());
@@ -142,7 +144,220 @@ queue<unsigned char> tree::maketree(string c){
       }
        kj.push(bb);
     }
+    codes = newcode;
     return kj;
 }
 
+decnode::decnode(char val,char c){
+        value=val;
+        ch=c;
+        left=NULL;
+        right=NULL;
+}
 
+decnode* decnode::addnode(decnode* n,char val){
+       static bool flag=0;
+
+        if ((n->right!=NULL)&&(val=='1')&&flag==0)  {
+
+                return  n->right;
+
+        }
+        else if(n->right==NULL&&val=='1'&&flag==0) {
+            n->right=new decnode(val,'\0');
+                return n->right;
+
+        }
+        else if (n->left!=NULL&&val=='0'&&flag==0) {
+
+               return  n->left;
+
+        }
+         else if(n->left==NULL&&val=='0'&&flag==0) {
+                n->left=new decnode(val,'\0');
+               return n->left;
+
+         }
+         else if(val=='&'&&flag==0){
+            flag=1;
+            return n;
+         }
+
+         else if(flag==1) {
+
+            n->ch=val;
+            flag=0;
+            return n;
+         }
+}
+
+dectree::dectree(){
+        decroot=NULL;
+    }
+
+decnode* dectree::add(char value,decnode*n){
+        if (decroot==NULL) {
+                decroot=new decnode('\0','\0');
+                return decroot;
+        }
+        else  return n->addnode(n,value);
+
+    }
+
+
+void writerecover(string filename,string z){
+fstream newfile;
+    string ssss="";
+    unsigned char zx;
+    newfile.open(filename,ios::out);
+    if(!newfile) ;
+    else {
+
+        for(unsigned int i=0;i<z.length();i++){
+             newfile<<z[i];
+        }
+    newfile.close();
+    }
+}
+
+string readfile(string filename){
+    string x="";
+    char xx;
+    fstream newfile;
+    newfile.open(filename,ios::in);
+    if(!newfile) cout<<"no such file";
+    else {
+        while (1){
+            newfile>>xx;
+            if(newfile.eof()) break;
+             x+=xx;
+        }
+
+        newfile.close();
+    }
+    return x;
+}
+
+void dectree::makedectree(string filename,string compfile,string recover){
+    decnode* p;
+    p=add('\0',p);
+
+    int sizee=0;
+    char xx;
+    fstream newfile;
+    newfile.open(filename,ios::in);
+    if(!newfile) ;
+    else {
+
+        string zz;
+        newfile>>zz;
+        sizee=atoi(zz.c_str());
+
+        while (1){
+                static bool flag1=0;
+                l1: newfile>>xx;
+
+            if(newfile.eof()) break;
+             p= add(xx,p);
+            if (xx=='&'&&flag1==0) {
+                   flag1=1;
+                    goto l1;
+            }
+
+            if (flag1==1) {
+
+                p=decroot;
+                flag1=0;
+           }
+
+        }
+        newfile.close();
+    }
+
+    //now we have the tree
+    //now we need to decomp
+    string s=readfile(compfile);
+    s=b2s(s);
+    p=decroot;
+    string z="";
+    for(unsigned int i=0;i<s.length()-sizee;i++){
+        if (s=="") return;
+        else if(decroot==NULL) return;
+        else if(s[i]=='1'&&p->right!=NULL) {
+            p=p->right;
+            if (p->right==NULL&&p->left==NULL)
+            {
+                z+=p->ch;
+                p=decroot;
+            }
+        }
+        else if(s[i]=='0'&&p->left!=NULL){
+             p=p->left;
+              if (p->right==NULL&&p->left==NULL)
+              {
+                  z+=p->ch;
+                  p=decroot;
+              }
+        }
+    }
+         writerecover(recover,z);
+    }
+
+string dectree::makedectree2(string key,string s){
+    decnode* p;
+    p=add('\0',p);
+    char xx;
+    int sizee=0;
+    string zz;
+    zz=key[0];
+    sizee=atoi(zz.c_str());
+    int i=0;
+    while (1){
+            static bool flag1=0;
+             i++;
+            l1: xx=key[i];
+
+            if (i==key.length()) break;
+             p= add(xx,p);
+              if (xx=='&'&&flag1==0) {
+                   flag1=1;
+                   i++;
+                    goto l1;
+            }
+
+
+        if (flag1==1) {
+        p=decroot;
+        flag1=0;
+        }
+        }
+    //now we have the tree
+    //now we need to decomp
+
+    s=b2s(s);//the compressed file
+
+    p=decroot;
+    string z="";
+     for(unsigned int i=0;i<s.length()-sizee;i++){
+        if (s=="") return "";
+        else if(decroot==NULL) return "";
+        else if(s[i]=='1'&&p->right!=NULL) {
+            p=p->right;
+            if (p->right==NULL&&p->left==NULL)
+            {
+                z+=p->ch;
+                p=decroot;
+            }
+        }
+        else if(s[i]=='0'&&p->left!=NULL){
+             p=p->left;
+              if (p->right==NULL&&p->left==NULL)
+              {
+                  z+=p->ch;
+                  p=decroot;
+              }
+        }
+    }
+        cout<<z;
+        return z;
+    }
