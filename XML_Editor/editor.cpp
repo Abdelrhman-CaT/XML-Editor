@@ -306,18 +306,8 @@ void Editor::on_actionMinify_triggered()
             else{
                 QTextStream in(&f);
                 QString file_text = "";
-                if(f.size() > 3*1024*1024){ // file larger than 3 MB
-                    ui->textEdit->setText("");
-                    QMessageBox::warning(this, "Warning", "Due to large file size > 3 MB, we will view the first 100 lines of the file only");
-                    for(int q=0; q<100; q++){
-                        file_text = in.readLine();
-                        ui->textEdit->append(file_text);
-                    }
-                }
-                else{
-                    file_text = in.readAll();
-                    ui->textEdit->setText(file_text);
-                }
+                file_text = in.readAll();
+                ui->textEdit->setText(file_text);
                 f.close();
                 ui->statusbar->showMessage("Done!");
             }
