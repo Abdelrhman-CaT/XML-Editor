@@ -305,9 +305,19 @@ void Editor::on_actionMinify_triggered()
             else{
                 QTextStream in(&f);
                 QString file_text = "";
-                file_text = in.readAll();
-                ui->textEdit->setText(file_text);
-                file.close();
+                if(f.size() > 3*1024*1024){ // file larger than 3 MB
+                    ui->textEdit->setText("");
+                    QMessageBox::warning(this, "Warning", "Due to large file size > 3 MB, we will view the first 100 lines of the file only");
+                    for(int q=0; q<100; q++){
+                        file_text = in.readLine();
+                        ui->textEdit->append(file_text);
+                    }
+                }
+                else{
+                    file_text = in.readAll();
+                    ui->textEdit->setText(file_text);
+                }
+                f.close();
                 ui->statusbar->showMessage("Done!");
             }
         }
@@ -342,9 +352,19 @@ void Editor::on_actionMinify_triggered()
         else{
             QTextStream in(&f);
             QString file_text = "";
-            file_text = in.readAll();
-            ui->textEdit->setText(file_text);
-            file.close();
+            if(f.size() > 3*1024*1024){ // file larger than 3 MB
+                ui->textEdit->setText("");
+                QMessageBox::warning(this, "Warning", "Due to large file size > 3 MB, we will view the first 100 lines of the file only");
+                for(int q=0; q<100; q++){
+                    file_text = in.readLine();
+                    ui->textEdit->append(file_text);
+                }
+            }
+            else{
+                file_text = in.readAll();
+                ui->textEdit->setText(file_text);
+            }
+            f.close();
             ui->statusbar->showMessage("Done!");
         }
     }
@@ -434,9 +454,19 @@ void Editor::on_actionPrettify_XML_triggered()
         else{
             QTextStream in(&f);
             QString file_text = "";
-            file_text = in.readAll();
-            ui->textEdit->setText(file_text);
-            file.close();
+            if(f.size() > 3*1024*1024){ // file larger than 3 MB
+                ui->textEdit->setText("");
+                QMessageBox::warning(this, "Warning", "Due to large file size > 3 MB, we will view the first 100 lines of the file only");
+                for(int q=0; q<100; q++){
+                    file_text = in.readLine();
+                    ui->textEdit->append(file_text);
+                }
+            }
+            else{
+                file_text = in.readAll();
+                ui->textEdit->setText(file_text);
+            }
+            f.close();
             ui->statusbar->showMessage("Done!");
         }
 
@@ -544,17 +574,26 @@ void Editor::on_actionFix_Consistency_Errors_triggered()
     ui->statusbar->showMessage("");
     ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
     //-----------------------------------------------------------------------------
+    QString filename = QFileDialog::getSaveFileName(this, "Choose the Location to Save the Consistent File", QDir::currentPath());
+    fpath = filename;
+    QFile file(filename);
+    if(!file.open(QFile::WriteOnly | QFile::Text)){
+        QMessageBox::warning(this, "Warning", "Cannot Save File!");
+        return;
+    }
     if(lines.size() == 0){
         lines = create_xml_vector(ui->textEdit->toPlainText());
     }
     QVector<QString> temp = lines;
+    QString consistent = "";
     QMap<qint32, QString> errors = identify_errors(temp);
     ui->textEdit->setText("");
     int i = 0;
     for(i=0; i<temp.size(); i++){
         if(errors.find(i) != errors.end()){
             if(errors[i][0] == 'A'){
-                ui->textEdit->append(temp[i]);
+                consistent += temp[i];
+                consistent += '\n';
             }
             else if(errors[i][0] == 'U'){
                 QString value = errors[i];
@@ -562,15 +601,19 @@ void Editor::on_actionFix_Consistency_Errors_triggered()
                 for(int k = 1; k < value.length(); k++){
                     viewValue += value[k];
                 }
-                ui->textEdit->append(temp[i]);
-                ui->textEdit->append(viewValue);
+                consistent += temp[i];
+                consistent += '\n';
+                consistent += viewValue;
+                consistent += '\n';
             }
             else if(errors[i][0] != 'D'){
-                ui->textEdit->append(errors[i]);
+                consistent += errors[i];
+                consistent += '\n';
             }
         }
         else{
-            ui->textEdit->append(temp[i]);
+            consistent += temp[i];
+            consistent += '\n';
         }
     }
 
@@ -588,10 +631,38 @@ void Editor::on_actionFix_Consistency_Errors_triggered()
             viewValue += value[k];
         }
         viewValue = "</" + viewValue;
-        ui->textEdit->append(viewValue);
+        consistent += viewValue;
+        consistent += '\n';
     }
     //-----------------------------------------------------------------------------
-    ui->statusbar->showMessage("Done!");
+    QTextStream out(&file);
+    out << consistent;
+    file.flush();
+    file.close();
+    QMessageBox::information(this, "Info", "File Fixed Successfully!\nThe Consistent File Can Be Found at: " + filename);
+    QFile f(filename);
+    if(!f.open(QFile::ReadOnly | QFile::Text)){
+        QMessageBox::warning(this, "Warning", "Cannot Open the Results File!");
+        return;
+    }
+    else{
+        QTextStream in(&f);
+        QString file_text = "";
+        if(f.size() > 3*1024*1024){ // file larger than 3 MB
+            ui->textEdit->setText("");
+            QMessageBox::warning(this, "Warning", "Due to large file size > 3 MB, we will view the first 100 lines of the file only");
+            for(int q=0; q<100; q++){
+                file_text = in.readLine();
+                ui->textEdit->append(file_text);
+            }
+        }
+        else{
+            file_text = in.readAll();
+            ui->textEdit->setText(file_text);
+        }
+        f.close();
+        ui->statusbar->showMessage("Done!");
+    }
 }
 //---------------------------------------------------------------------------------------------------------------------------
 
