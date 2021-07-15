@@ -26,11 +26,6 @@ Extensible Markup Language (XML) is a markup language that defines a set of rule
 ## How We Built It
 The XML egitor was built using C++ Qt5 to for the interactive GUI. Qt5 allows us to built a full user experience. For the backend we use C++ to enhance different functionalities. 
 
-
-## Running the application
-Just open the XML_Editor.exe and it will run.
-
-
 ## Current Contributors
 <a href="https://github.com/Abdelrhman-CaT/XML-Editor/graphs/contributors">
     
