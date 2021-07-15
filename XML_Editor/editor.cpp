@@ -343,18 +343,8 @@ void Editor::on_actionMinify_triggered()
         else{
             QTextStream in(&f);
             QString file_text = "";
-            if(f.size() > 3*1024*1024){ // file larger than 3 MB
-                ui->textEdit->setText("");
-                QMessageBox::warning(this, "Warning", "Due to large file size > 3 MB, we will view the first 100 lines of the file only");
-                for(int q=0; q<100; q++){
-                    file_text = in.readLine();
-                    ui->textEdit->append(file_text);
-                }
-            }
-            else{
-                file_text = in.readAll();
-                ui->textEdit->setText(file_text);
-            }
+            file_text = in.readAll();
+            ui->textEdit->setText(file_text);
             f.close();
             ui->statusbar->showMessage("Done!");
         }
@@ -382,7 +372,6 @@ QString remove_one_indentation(QString str, QString indent){
 void Editor::on_actionPrettify_XML_triggered()
 {
     ui->statusbar->showMessage("");
-    ui->textEdit->setLineWrapMode(QTextEdit::NoWrap);
     //-----------------------------------------------------------------------------
     QString indent_char = "     ";
     if(lines.size() == 0){
@@ -437,6 +426,7 @@ void Editor::on_actionPrettify_XML_triggered()
         file.flush();
         file.close();
         QMessageBox::information(this, "Info", "File Prettified Successfully!\nThe Prettified File Can Be Found at: " + filename);
+        ui->textEdit->setLineWrapMode(QTextEdit::NoWrap);
         QFile f(filename);
         if(!f.open(QFile::ReadOnly | QFile::Text)){
             QMessageBox::warning(this, "Warning", "Cannot Open the Results File!");
