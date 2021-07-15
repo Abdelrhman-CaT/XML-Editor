@@ -3,6 +3,7 @@
 #include "xml_vector.h"
 #include "consistency_check.h"
 #include "compression.h"
+#include "json.h"
 #include "QFile"
 #include "QFileDialog"
 #include "QDir"
@@ -296,6 +297,19 @@ void Editor::on_actionMinify_triggered()
             file.flush();
             file.close();
             QMessageBox::information(this, "Info", "File Minified Successfully!\nThe Minified File Can Be Found at: " + filename);
+            QFile f(filename);
+            if(!f.open(QFile::ReadOnly | QFile::Text)){
+                QMessageBox::warning(this, "Warning", "Cannot Open the Results File!");
+                return;
+            }
+            else{
+                QTextStream in(&f);
+                QString file_text = "";
+                file_text = in.readAll();
+                ui->textEdit->setText(file_text);
+                file.close();
+                ui->statusbar->showMessage("Done!");
+            }
         }
         else{
             QMessageBox::warning(this, "Warning", "No Text To Be Minified!");
@@ -320,11 +334,21 @@ void Editor::on_actionMinify_triggered()
         file.flush();
         file.close();
         QMessageBox::information(this, "Info", "File Minified Successfully!\nThe Minified File Can Be Found at: " + filename);
+        QFile f(filename);
+        if(!f.open(QFile::ReadOnly | QFile::Text)){
+            QMessageBox::warning(this, "Warning", "Cannot Open the Results File!");
+            return;
+        }
+        else{
+            QTextStream in(&f);
+            QString file_text = "";
+            file_text = in.readAll();
+            ui->textEdit->setText(file_text);
+            file.close();
+            ui->statusbar->showMessage("Done!");
+        }
     }
     //ui->textEdit->setText(out);
-
-    //-----------------------------------------------------------------------------
-    ui->statusbar->showMessage("Done!");
 }
 //---------------------------------------------------------------------------------------------------------------------------
 
@@ -347,7 +371,7 @@ QString remove_one_indentation(QString str, QString indent){
 void Editor::on_actionPrettify_XML_triggered()
 {
     ui->statusbar->showMessage("");
-    ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
+    ui->textEdit->setLineWrapMode(QTextEdit::NoWrap);
     //-----------------------------------------------------------------------------
     QString indent_char = "     ";
     if(lines.size() == 0){
@@ -402,7 +426,20 @@ void Editor::on_actionPrettify_XML_triggered()
         file.flush();
         file.close();
         QMessageBox::information(this, "Info", "File Prettified Successfully!\nThe Prettified File Can Be Found at: " + filename);
-        ui->statusbar->showMessage("Done!");
+        QFile f(filename);
+        if(!f.open(QFile::ReadOnly | QFile::Text)){
+            QMessageBox::warning(this, "Warning", "Cannot Open the Results File!");
+            return;
+        }
+        else{
+            QTextStream in(&f);
+            QString file_text = "";
+            file_text = in.readAll();
+            ui->textEdit->setText(file_text);
+            file.close();
+            ui->statusbar->showMessage("Done!");
+        }
+
     }
     else{
         QMessageBox::warning(this, "Warning", "Cannot Prettify an Inconsistent XML file!");
@@ -565,7 +602,62 @@ void Editor::on_actionFix_Consistency_Errors_triggered()
 // Compress File
 void Editor::on_actionCompress_Data_triggered()
 {
-
+    ui->statusbar->showMessage("");
+    ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
+    //-----------------------------------------------------------------------------
+    // declaring vars
+    queue<unsigned char> kj;
+    double old_size = 0;
+    double new_size = 0;
+    // Handeling opening
+    QString filename = QFileDialog::getOpenFileName(this, "Choose a File", QDir::currentPath());
+    string c = ""; //readfile(filename.toLocal8Bit().constData());
+    char xx;
+    fstream newfile;
+    newfile.open(filename.toLocal8Bit().constData(), ios::in);
+    if (!newfile){
+        QMessageBox::warning(this, "Warning", "Cannot Open File!");
+        return;
+    }
+    else {
+        while (1) {
+            newfile >> xx;
+            if (newfile.eof()) break;
+            c += xx;
+        }
+        newfile.close();
+        // calculating old size
+        QFile old(filename);
+        old_size = old.size()/1024.0;
+        // Handling saving
+        fstream newfile2;
+        QString fname = QFileDialog::getSaveFileName(this, "Choose a Location to Save the Compressed File", QDir::currentPath());
+        newfile2.open(fname.toLocal8Bit().constData(), ios::out);
+        if (!newfile2){
+             QMessageBox::warning(this, "Warning", "Cannot Save File!");
+             return;
+        }
+        else {
+            // Processing
+            tree t1;
+            kj = t1.maketree(c); //to write to a file
+            // Writing to the save file
+            unsigned char zx;
+            for (unsigned int i = 0; kj.size() != 0; i++) {
+                // ssss+=kj.front();
+                zx = kj.front();
+                // cout<<zx<<endl;
+                newfile2 << zx;
+                kj.pop();
+            }
+            newfile2.close();
+            QFile file(fname);
+            new_size = file.size()/1024.0;
+            // Finalization
+            ui->statusbar->showMessage("Done!");
+            QMessageBox::information(this, "Info", "File Compressed Successfully!\nOld File Size is " + QString::number(old_size) + " KB\nNew File Size is " + QString::number(new_size) + " KB");
+        }
+    }
 }
 //---------------------------------------------------------------------------------------------------------------------------
 
@@ -584,10 +676,51 @@ void Editor::on_actionConvert_to_JSON_triggered()
         QMessageBox::warning(this, "Warning", "No Text To Be Converted");
         return;
     }
-    string inQ = in.toLocal8Bit().constData();
-    vector<string> linesQ = create_xml_vectorQ(inQ);
-    // pass linesQ to the convert function
 
+    /*
+    // File input
+    QString filename = QFileDialog::getSaveFileName(this, "Choose the Location to Save the JSON File", QDir::currentPath());
+    fpath = filename;
+    QFile file(filename);
+    if(!file.open(QFile::WriteOnly | QFile::Text)){
+        QMessageBox::warning(this, "Warning", "Cannot Save File!");
+        return;
+    }
+    */
+
+    // Processing
+    lines = create_xml_vector(in);
+    if(!check_consistency(lines)){
+        QMessageBox::warning(this, "Warning", "Cannot Convert An Inconsistent File");
+        return;
+    }
+    string inq = in.toLocal8Bit().constData();
+    vector<string> linesQ = create_xml_vectorQ(inq);
+    int linesQSize = linesQ.size();
+    node *root;
+    root = create_tree(linesQ, linesQSize);
+    string out = "";
+    out  = iteration(root, out);
+    QString res = QString::fromStdString(out);
+    /*
+    for(int i=0; i<linesQ.size(); i++){
+        cout << linesQ[i] << '\n';
+    }
+    */
+
+    // Output
+    //--------------
+    // on screen
+    ui->textEdit->setText(res);
+
+    // to file
+    /*
+    QTextStream outt(&file);
+    outt << res;
+    file.flush();
+    file.close();
+    QMessageBox::information(this, "Info", "File Coverted Successfully!\nThe JSON File Can Be Found at: " + filename);
+    */
     //-----------------------------------------------------------------------------
     ui->statusbar->showMessage("Done!");
 }
