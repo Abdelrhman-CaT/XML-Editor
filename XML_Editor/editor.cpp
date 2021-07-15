@@ -3,7 +3,7 @@
 #include "xml_vector.h"
 #include "consistency_check.h"
 #include "compression.h"
-#include "json.h"
+//#include "json.h"
 #include "QFile"
 #include "QFileDialog"
 #include "QDir"
@@ -14,6 +14,7 @@
 #include "QColor"
 #include "QColorDialog"
 #include "QTextEdit"
+#include "QDebug"
 
 //---------------------------------------------------------------------------------------------------------------------------
 // Initialization
@@ -456,7 +457,7 @@ void Editor::on_actionPrettify_XML_triggered()
             QString file_text = "";
             if(f.size() > 3*1024*1024){ // file larger than 3 MB
                 ui->textEdit->setText("");
-                QMessageBox::warning(this, "Warning", "Due to large file size > 3 MB, we will view the first 100 lines of the file only");
+                QMessageBox::warning(this, "Warning", "Due to large file size > 3 MB, we will view the first 100 lines of the output file only");
                 for(int q=0; q<100; q++){
                     file_text = in.readLine();
                     ui->textEdit->append(file_text);
@@ -650,7 +651,7 @@ void Editor::on_actionFix_Consistency_Errors_triggered()
         QString file_text = "";
         if(f.size() > 3*1024*1024){ // file larger than 3 MB
             ui->textEdit->setText("");
-            QMessageBox::warning(this, "Warning", "Due to large file size > 3 MB, we will view the first 100 lines of the file only");
+            QMessageBox::warning(this, "Warning", "Due to large file size > 3 MB, we will view the first 100 lines of the output file only");
             for(int q=0; q<100; q++){
                 file_text = in.readLine();
                 ui->textEdit->append(file_text);
@@ -681,54 +682,71 @@ void Editor::on_actionCompress_Data_triggered()
     double old_size = 0;
     double new_size = 0;
     // Handeling opening
+    //----------------------------------------------------------------------------------------------------------------------
     QString filename = QFileDialog::getOpenFileName(this, "Choose a File", QDir::currentPath());
-    string c = ""; //readfile(filename.toLocal8Bit().constData());
-    char xx;
-    fstream newfile;
-    newfile.open(filename.toLocal8Bit().constData(), ios::in);
-    if (!newfile){
+    QFile old(filename);
+    if(!old.open(QFile::ReadOnly | QFile::Text)){
         QMessageBox::warning(this, "Warning", "Cannot Open File!");
         return;
     }
-    else {
-        while (1) {
-            newfile >> xx;
-            if (newfile.eof()) break;
-            c += xx;
-        }
-        newfile.close();
-        // calculating old size
-        QFile old(filename);
-        old_size = old.size()/1024.0;
-        // Handling saving
-        fstream newfile2;
-        QString fname = QFileDialog::getSaveFileName(this, "Choose a Location to Save the Compressed File", QDir::currentPath());
-        newfile2.open(fname.toLocal8Bit().constData(), ios::out);
-        if (!newfile2){
-             QMessageBox::warning(this, "Warning", "Cannot Save File!");
-             return;
-        }
-        else {
-            // Processing
-            tree t1;
-            kj = t1.maketree(c); //to write to a file
-            // Writing to the save file
-            unsigned char zx;
-            for (unsigned int i = 0; kj.size() != 0; i++) {
-                // ssss+=kj.front();
-                zx = kj.front();
-                // cout<<zx<<endl;
-                newfile2 << zx;
-                kj.pop();
-            }
-            newfile2.close();
-            QFile file(fname);
-            new_size = file.size()/1024.0;
-            // Finalization
-            ui->statusbar->showMessage("Done!");
-            QMessageBox::information(this, "Info", "File Compressed Successfully!\nOld File Size is " + QString::number(old_size) + " KB\nNew File Size is " + QString::number(new_size) + " KB");
-        }
+    QTextStream inOld(&old);
+    QString cQ = inOld.readAll();
+    string c = cQ.toLocal8Bit().constData();
+    // calculating old size
+    old_size = old.size()/1024.0;
+    old.close();
+    //----------------------------------------------------------------------------------------------------------------------
+    QString fname = QFileDialog::getSaveFileName(this, "Choose the Location to Save the Compressed File", QDir::currentPath());
+    QFile neew(fname);
+    if(!neew.open(QFile::WriteOnly | QFile::Text)){
+        QMessageBox::warning(this, "Warning", "Cannot Save File!");
+        return;
     }
+    QTextStream out(&neew);
+    // Processing
+    tree t1;
+    kj = t1.maketree(c); //to write to a file
+    unsigned char zx;
+    QString final = "";
+    for (unsigned int i = 0; kj.size() != 0; i++) {
+        // ssss+=kj.front();
+        zx = kj.front();
+        // cout<<zx<<endl;
+        //out << zx;
+        final += zx;
+        kj.pop();
+    }
+    out << final;
+    neew.flush();
+    neew.close();
+    new_size = neew.size()/1024.0;
+    // Finalization
+    ui->statusbar->showMessage("Done!");
+    QMessageBox::information(this, "Info", "File Compressed Successfully!\nThe Compressed File Can Be Found At: " + fname + "\nOld File Size is " + QString::number(old_size) + " KB\nNew File Size is " + QString::number(new_size) + " KB");
+    QFile file(fname);
+    if(!file.open(QFile::ReadOnly | QFile::Text)){
+        QMessageBox::warning(this, "Warning", "Cannot Open the Results File!");
+        return;
+    }
+    else{
+        QTextStream in(&file);
+        QString file_text = "";
+        if(new_size > 3*1024){ // file larger than 3 MB
+            ui->textEdit->setText("");
+            QMessageBox::warning(this, "Warning", "Due to large file size > 3 MB, we will view the first 100 lines of the output file only");
+            for(int q=0; q<100; q++){
+                file_text = in.readLine();
+                ui->textEdit->append(file_text);
+            }
+        }
+        else{
+            file_text = in.readAll();
+            ui->textEdit->setText(file_text);
+        }
+        file.close();
+        ui->statusbar->showMessage("Done!");
+    }
+    //-----------------------------------------------------------------------------------------------------------------------
 }
 //---------------------------------------------------------------------------------------------------------------------------
 
@@ -739,60 +757,6 @@ void Editor::on_actionCompress_Data_triggered()
 // convert XML to JSON
 void Editor::on_actionConvert_to_JSON_triggered()
 {
-    ui->statusbar->showMessage("");
-    ui->textEdit->setLineWrapMode(QTextEdit::NoWrap);
-    //-----------------------------------------------------------------------------
-    QString in = ui->textEdit->toPlainText();
-    if(in == ""){
-        QMessageBox::warning(this, "Warning", "No Text To Be Converted");
-        return;
-    }
 
-    /*
-    // File input
-    QString filename = QFileDialog::getSaveFileName(this, "Choose the Location to Save the JSON File", QDir::currentPath());
-    fpath = filename;
-    QFile file(filename);
-    if(!file.open(QFile::WriteOnly | QFile::Text)){
-        QMessageBox::warning(this, "Warning", "Cannot Save File!");
-        return;
-    }
-    */
-
-    // Processing
-    lines = create_xml_vector(in);
-    if(!check_consistency(lines)){
-        QMessageBox::warning(this, "Warning", "Cannot Convert An Inconsistent File");
-        return;
-    }
-    string inq = in.toLocal8Bit().constData();
-    vector<string> linesQ = create_xml_vectorQ(inq);
-    int linesQSize = linesQ.size();
-    node *root;
-    root = create_tree(linesQ, linesQSize);
-    string out = "";
-    out  = iteration(root, out);
-    QString res = QString::fromStdString(out);
-    /*
-    for(int i=0; i<linesQ.size(); i++){
-        cout << linesQ[i] << '\n';
-    }
-    */
-
-    // Output
-    //--------------
-    // on screen
-    ui->textEdit->setText(res);
-
-    // to file
-    /*
-    QTextStream outt(&file);
-    outt << res;
-    file.flush();
-    file.close();
-    QMessageBox::information(this, "Info", "File Coverted Successfully!\nThe JSON File Can Be Found at: " + filename);
-    */
-    //-----------------------------------------------------------------------------
-    ui->statusbar->showMessage("Done!");
 }
 
