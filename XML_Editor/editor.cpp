@@ -30,7 +30,7 @@ Editor::Editor(QWidget *parent)
     on_actionDark_Light_mode_triggered(); // To make Dark mode the default mode
     ui->actionShow_Consistency_Errors->setDisabled(true);
     ui->actionFix_Consistency_Errors->setDisabled(true);
-    ui->actionDecompress_File->setVisible(false);
+    //ui->actionDecompress_File->setVisible(false);
 }
 
 Editor::~Editor()
@@ -687,22 +687,25 @@ void Editor::on_actionCompress_Data_triggered()
         return;
     }
     // Choosing the location to save the compression key
-    /*
+
     QString codeName = QFileDialog::getSaveFileName(this, "Choose the Location to Save the Compression Key File", QDir::currentPath());
     QFile key(codeName);
     if(!key.open(QFile::WriteOnly | QFile::Text)){
         QMessageBox::warning(this, "Warning", "Cannot Save File!");
         return;
     }
+    fstream write_to_compressed;
+    fstream write_to_key;
+    write_to_compressed.open(fname.toLocal8Bit().constData(), ios::out);
+    write_to_key.open(codeName.toLocal8Bit().constData(), ios::out);
+    //QTextStream cooode(&key);
 
-    QTextStream cooode(&key);
-    */
-    QTextStream out(&neew);
+    //QTextStream out(&neew);
     // Processing
     tree t1;
     kj = t1.maketree(c, new_code, sizee); //to write to a file
     unsigned char zx;
-    QString final = "";
+    string final = "";
     for (unsigned int i = 0; kj.size() != 0; i++) {
         // ssss+=kj.front();
         zx = kj.front();
@@ -711,30 +714,32 @@ void Editor::on_actionCompress_Data_triggered()
         final += zx;
         kj.pop();
     }
-    out << final;
+    write_to_compressed << final;
     neew.flush();
     neew.close();
-    new_size = neew.size()/1024.0;
+
     // writing the compression key code file
-    /*
-    cooode << sizee << endl;
+
+    write_to_key << sizee << endl;
     for(auto i = new_code.begin(); i!=new_code.end(); i++){
         string temp = i->second + '&' + i->first;
-        QString tempQ = QString::fromStdString(temp);
-        cooode << tempQ;
+        //cout << temp;
+        //QString tempQ = QString::fromStdString(temp);
+        write_to_key << temp;
     }
-    key.flush();
-    key.close();
-    */
+    write_to_compressed.close();
+    write_to_key.close();
+
     // Finalization
     ui->statusbar->showMessage("Done!");
-    QMessageBox::information(this, "Info", "File Compressed Successfully!\nThe Compressed File Can Be Found At: " + fname + "\nOld File Size is " + QString::number(old_size) + " KB\nNew File Size is " + QString::number(new_size) + " KB");
     QFile file(fname);
     if(!file.open(QFile::ReadOnly | QFile::Text)){
         QMessageBox::warning(this, "Warning", "Cannot Open the Results File!");
         return;
     }
     else{
+        new_size = file.size()/1024.0;
+        QMessageBox::information(this, "Info", "File Compressed Successfully!\nThe Compressed File Can Be Found At: " + fname + "\nOld File Size is " + QString::number(old_size) + " KB\nNew File Size is " + QString::number(new_size) + " KB");
         QTextStream in(&file);
         QString file_text = "";
         if(new_size > 3*1024){ // file larger than 3 MB
@@ -764,32 +769,46 @@ void Editor::on_actionDecompress_File_triggered()
     //----------------------------------------------------------------------------
     // reading compressed file
     QString compressedFileName = QFileDialog::getOpenFileName(this, "Choose the Compressed File", QDir::currentPath());
+    /*
     QFile compressedFile(compressedFileName);
     if(!compressedFile.open(QFile::ReadOnly | QFile::Text)){
         QMessageBox::warning(this, "Warning", "Cannot Open The Compressed File!");
         return;
     }
-    QTextStream inOld(&compressedFile);
-    QString cQ = inOld.readAll();
-    string compress = cQ.toLocal8Bit().constData();      // contains the compressed file
-    compressedFile.close();
-    old_size = compressedFile.size();
+    */
+    string COMPRESSED = readfile(compressedFileName.toLocal8Bit().constData());
+
+    //QTextStream inOld(&compressedFile);
+    //QString cQ = inOld.readAll();
+    //string compress = cQ.toLocal8Bit().constData();      // contains the compressed file
+    //compressedFile.close();
+    //old_size = compressedFile.size();
     //string cf = compressedFileName.toLocal8Bit().constData();
     // reading compression key file
     QString compressionKeyFileName = QFileDialog::getOpenFileName(this, "Choose the Compression Key File", QDir::currentPath());
+    /*
     QFile compressionKeyFile(compressionKeyFileName);
     if(!compressionKeyFile.open(QFile::ReadOnly | QFile::Text)){
         QMessageBox::warning(this, "Warning", "Cannot Open The Compression Key File!");
         return;
     }
-    QTextStream inKey(&compressionKeyFile);
-    QString cQQ = compressionKeyFile.readAll();
-    string compressKey = cQ.toLocal8Bit().constData();      // contains the compression key
-    compressedFile.close();
+    */
+    string KEY = readfile(compressionKeyFileName.toLocal8Bit().constData());
+
+    //QTextStream inKey(&compressionKeyFile);
+    //QString cQQ = compressionKeyFile.readAll();
+    //string compressKey = cQ.toLocal8Bit().constData();      // contains the compression key
+    //compressedFile.close();
     //string ck = compressionKeyFileName.toLocal8Bit().constData();
     QString decompressedFileName = QFileDialog::getSaveFileName(this, "Choose the Location to Save the Decompressed File", QDir::currentPath());
-    QFile decomp(decompressedFileName);
-    if(!decomp.open(QFile::WriteOnly | QFile::Text)){
+    //QFile decomp(decompressedFileName);
+    //if(!decomp.open(QFile::WriteOnly | QFile::Text)){
+        //QMessageBox::warning(this, "Warning", "Cannot Save File!");
+        //return;
+    //}
+    fstream write_to_decomp;
+    write_to_decomp.open(decompressedFileName.toLocal8Bit().constData(), ios::out);
+    if(!write_to_decomp){
         QMessageBox::warning(this, "Warning", "Cannot Save File!");
         return;
     }
@@ -798,16 +817,23 @@ void Editor::on_actionDecompress_File_triggered()
     // processing
     dectree t2;
     string resQ;
-    resQ = t2.makedectree2(compressKey,compress);
-    QString res = QString::fromStdString(resQ);
+    string CC = b2s(COMPRESSED);
+    resQ = t2.makedectree2(KEY,CC);
+    for(unsigned int i=0; i<resQ.length(); i++){
+        write_to_decomp << resQ[i];
+    }
+    write_to_decomp.close();
+    //QString res = QString::fromStdString(resQ);
     //----------------------------------------------------------------------------------------------
     // writing the decoded file
+    /*
     QTextStream out(&decomp);
     out << res;
     decomp.flush();
     decomp.close();
+    */
     // reading the output file
-    QMessageBox::information(this, "Info", "File Decompressed Successfully!\nThe Decompressed File Can Be Found At: " + decompressedFileName + "\nOld File Size is " + QString::number(old_size) + " KB\nNew File Size is " + QString::number(new_size) + " KB");
+    QMessageBox::information(this, "Info", "File Decompressed Successfully!\nThe Decompressed File Can Be Found At: " + decompressedFileName);
     QFile file(decompressedFileName);
     if(!file.open(QFile::ReadOnly | QFile::Text)){
         QMessageBox::warning(this, "Warning", "Cannot Open the Results File!");

@@ -80,4 +80,5 @@ public:
     string makedectree2(string key,string s);
 };
 
+string readfile(string filename);
 #endif // COMPRESSION_H

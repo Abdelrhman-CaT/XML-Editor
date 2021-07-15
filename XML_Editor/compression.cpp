@@ -304,18 +304,48 @@ void dectree::makedectree(string filename,string compfile,string recover){
     }
 
 string dectree::makedectree2(string key,string s){
-    decnode* p;
+      decnode* p;
     p=add('\0',p);
+    cout<<"root"<<" "<<p->ch<<endl;
+    //cout<<'\0';
+   // string x="";
     char xx;
     int sizee=0;
     string zz;
+
     zz=key[0];
+//     key=key-zz;
     sizee=atoi(zz.c_str());
+   /* cout<<sizee<<endl;
+    cout<<key.length()<<endl;
+    cout<<s<<endl;*/
+   /* for(unsigned int i=1;i<key.length();i++){
+           // int i=1;
+
+          static bool flag1=0;
+            l1: xx=key[i];
+           // cout<<"the xx= "<<xx<<endl;
+            p= add(xx,p);
+           // cout<<"ghh"<<endl;
+            if (xx=='&'&&flag1==0) {
+                   flag1=1;
+                   i++;
+                    goto l1;
+            }
+           // cout<<xx<<endl;
+            cout<<"vvvv"<<xx<<endl;
+           // if(xx!='1'&&xx!='0'&&xx!='&') p=decroot;
+        if (flag1==1) {
+        p=decroot;
+        flag1=0;
+        }
+    }*/
     int i=0;
     while (1){
             static bool flag1=0;
              i++;
             l1: xx=key[i];
+            //key=key-xx;
 
             if (i==key.length()) break;
              p= add(xx,p);
@@ -324,8 +354,8 @@ string dectree::makedectree2(string key,string s){
                    i++;
                     goto l1;
             }
-
-
+        cout<<"vvvv"<<xx<<endl;
+           // if(xx!='1'&&xx!='0'&&xx!='&') p=decroot;
         if (flag1==1) {
         p=decroot;
         flag1=0;
@@ -333,9 +363,11 @@ string dectree::makedectree2(string key,string s){
         }
     //now we have the tree
     //now we need to decomp
-
-    s=b2s(s);//the compressed file
-
+   // cout<<"the string is "<<s<<endl;
+    //s=b2s(s);//the compressed file
+   // s="0110001001111011100110101000111110100000";
+   // cout<<"the string after read it "<<endl<<s<<endl;
+    //0110001001111011100110101000111110100000
     p=decroot;
     string z="";
      for(unsigned int i=0;i<s.length()-sizee;i++){
